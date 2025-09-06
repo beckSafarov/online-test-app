@@ -57,15 +57,12 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const formData = await request.formData()
+    const body = await request.json()
 
-    const submittedAt = formData.get('submitted_at') as string
-    const is_completed = formData.get('is_completed') as string
-    const did_violate = formData.get('did_violate') as string
-    const test_id = formData.get('test_id') as string
+    const { submitted_at, is_completed, did_violate, sessionId, test_id } = body
 
     // Validate required fields
-    if (!submittedAt || !is_completed || !did_violate || !test_id) {
+    if (!submitted_at || !is_completed || !did_violate || !test_id) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -75,12 +72,13 @@ export async function PUT(request: NextRequest) {
     // Insert test session record
     const { data, error } = await supabase
       .from('test_sessions')
-      .insert({
-        submittedAt: submittedAt,
+      .update({
+        submitted_at,
         is_completed: Boolean(is_completed),
         did_violate: Boolean(did_violate),
         test_id: test_id,
       })
+      .eq('id', sessionId)
       .select()
       .single()
 
