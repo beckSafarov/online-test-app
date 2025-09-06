@@ -1,11 +1,23 @@
 import { create } from 'zustand'
 
+export interface Question {
+  id: string
+  type: 'mcq' | 'multi_select' | 'text'
+  question: string
+  options?: { id: string; text: string }[]
+  correct_answer?: string
+  correct_answers?: string[]
+  max_length?: number
+  points?: number
+}
+
 export interface TestData {
   id: string
   title: string
   description?: string
-  questions?: any[]
-  // Add other properties based on your test data structure
+  questions?: Question[]
+  duration_minutes?: number
+  admin_email?: string
 }
 
 interface TestStore {

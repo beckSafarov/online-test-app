@@ -42,7 +42,7 @@ export default function TestInstructionsPage() {
 
   return (
     <div className='min-h-screen bg-gray-50 py-8 sm:py-12'>
-      <Container size='lg'>
+      <Container size='sm'>
         {/* Header Section */}
         <div className='mb-8 sm:mb-12 text-center'>
           <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600 mb-2 sm:mb-4'>
@@ -60,8 +60,16 @@ export default function TestInstructionsPage() {
         <div className='bg-yellow-50 border-l-4 border-yellow-400 p-4 sm:p-6 mb-6 sm:mb-8 rounded-r-lg'>
           <div className='flex'>
             <div className='flex-shrink-0'>
-              <svg className='h-5 w-5 text-yellow-400' viewBox='0 0 20 20' fill='currentColor'>
-                <path fillRule='evenodd' d='M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z' clipRule='evenodd' />
+              <svg
+                className='h-5 w-5 text-yellow-400'
+                viewBox='0 0 20 20'
+                fill='currentColor'
+              >
+                <path
+                  fillRule='evenodd'
+                  d='M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z'
+                  clipRule='evenodd'
+                />
               </svg>
             </div>
             <div className='ml-3'>
@@ -69,7 +77,10 @@ export default function TestInstructionsPage() {
                 Important Warning
               </h3>
               <div className='mt-2 text-sm text-yellow-700'>
-                <p>This is a monitored online test. Please ensure you follow all rules.</p>
+                <p>
+                  This is a monitored online test. Please ensure you follow all
+                  rules.
+                </p>
               </div>
             </div>
           </div>
@@ -80,7 +91,7 @@ export default function TestInstructionsPage() {
           <h3 className='text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6'>
             Test Rules & Guidelines
           </h3>
-          
+
           <div className='space-y-4 sm:space-y-6'>
             <div className='flex items-start'>
               <div className='flex-shrink-0 mt-1'>
@@ -88,8 +99,10 @@ export default function TestInstructionsPage() {
               </div>
               <div className='ml-3 sm:ml-4'>
                 <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>No Cheating:</strong> Any form of cheating, including using external resources, 
-                  collaborating with others, or using unauthorized materials is strictly prohibited.
+                  <strong className='text-gray-900'>No Cheating:</strong> Any
+                  form of cheating, including using external resources,
+                  collaborating with others, or using unauthorized materials is
+                  strictly prohibited.
                 </p>
               </div>
             </div>
@@ -100,8 +113,11 @@ export default function TestInstructionsPage() {
               </div>
               <div className='ml-3 sm:ml-4'>
                 <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>No Tab/App Switching:</strong> Switching to other browser tabs, applications, 
-                  or leaving the test window will result in automatic test failure.
+                  <strong className='text-gray-900'>
+                    No Tab/App Switching:
+                  </strong>{' '}
+                  Switching to other browser tabs, applications, or leaving the
+                  test window will result in automatic test failure.
                 </p>
               </div>
             </div>
@@ -112,8 +128,9 @@ export default function TestInstructionsPage() {
               </div>
               <div className='ml-3 sm:ml-4'>
                 <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>Full Screen Mode:</strong> The test must be taken in full screen mode. 
-                  Exiting full screen will terminate the test.
+                  <strong className='text-gray-900'>Full Screen Mode:</strong>{' '}
+                  The test must be taken in full screen mode. Exiting full
+                  screen will terminate the test.
                 </p>
               </div>
             </div>
@@ -124,8 +141,9 @@ export default function TestInstructionsPage() {
               </div>
               <div className='ml-3 sm:ml-4'>
                 <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>Time Limit:</strong> Complete the test within the allocated time. 
-                  The test will auto-submit when time expires.
+                  <strong className='text-gray-900'>Time Limit:</strong>{' '}
+                  Complete the test within the allocated time. The test will
+                  auto-submit when time expires.
                 </p>
               </div>
             </div>
@@ -136,8 +154,9 @@ export default function TestInstructionsPage() {
               </div>
               <div className='ml-3 sm:ml-4'>
                 <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>Single Attempt:</strong> You have only one attempt to complete this test. 
-                  Once started, you cannot restart.
+                  <strong className='text-gray-900'>Single Attempt:</strong> You
+                  have only one attempt to complete this test. Once started, you
+                  cannot restart.
                 </p>
               </div>
             </div>
@@ -148,8 +167,11 @@ export default function TestInstructionsPage() {
               </div>
               <div className='ml-3 sm:ml-4'>
                 <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>Technical Requirements:</strong> Ensure stable internet connection. 
-                  Technical issues during the test may not allow for retakes.
+                  <strong className='text-gray-900'>
+                    Technical Requirements:
+                  </strong>{' '}
+                  Ensure stable internet connection. Technical issues during the
+                  test may not allow for retakes.
                 </p>
               </div>
             </div>
@@ -162,8 +184,9 @@ export default function TestInstructionsPage() {
             Violation Consequences
           </h3>
           <p className='text-sm sm:text-base text-red-700 leading-relaxed'>
-            Any violation of the above rules will result in immediate test termination and 
-            disqualification. Your test attempt will be marked as failed and no retakes will be allowed.
+            Any violation of the above rules will result in immediate test
+            termination and disqualification. Your test attempt will be marked
+            as failed and no retakes will be allowed.
           </p>
         </div>
 
@@ -186,7 +209,8 @@ export default function TestInstructionsPage() {
         {/* Disclaimer */}
         <div className='mt-4 sm:mt-6 text-center'>
           <p className='text-xs sm:text-sm text-gray-500 px-4 sm:px-0'>
-            By clicking "Proceed to Test", you acknowledge that you have read and agree to follow all test rules.
+            By clicking "Proceed to Test", you acknowledge that you have read
+            and agree to follow all test rules.
           </p>
         </div>
       </Container>
