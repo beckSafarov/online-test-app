@@ -1,20 +1,19 @@
 // Common UI Components
-export { default as Button } from './Button'
-export type { ButtonProps } from './Button'
+export { default as Button } from './ui/Button'
+export type { ButtonProps } from './ui/Button'
 
-export { default as Input } from './Input'
-export type { InputProps } from './Input'
+export { default as Input } from './forms/Input'
+export type { InputProps } from './forms/Input'
 
-export { default as Alert } from './Alert'
-export type { AlertProps } from './Alert'
-
+export { default as Alert } from './ui/Alert'
+export type { AlertProps } from './ui/Alert'
 // Icons
-export * from './Icons'
+export * from './ui/Icons'
 
-export { default as LoadingSpinner } from './LoadingSpinner'
-export type { LoadingSpinnerProps } from './LoadingSpinner'
+export { default as LoadingSpinner } from './ui/LoadingSpinner'
+export type { LoadingSpinnerProps } from './ui/LoadingSpinner'
 
-export { default as Card } from './Card'
-export type { CardProps } from './Card'
+export { default as Card } from './ui/Card'
+export type { CardProps } from './ui/Card'
 
-export { default as Container } from './Container'
+export { default as Container } from './ui/Container'

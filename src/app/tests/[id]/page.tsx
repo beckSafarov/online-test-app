@@ -2,164 +2,19 @@
 
 import { useTestStore, Question } from '@/store/testStore'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState, useRef, useMemo, useCallback, memo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Container,
-  Button,
-  LoadingSpinner,
-  Alert,
   FullscreenIcon,
   ExitFullscreenIcon,
   BackArrowIcon,
 } from '@/components'
+import QuestionCard from '@/components/forms/QuestionCard'
 
 interface Answer {
   questionId: string
   answer: string | string[]
 }
-
-interface QuestionComponentProps {
-  question: Question
-  index: number
-  currentAnswer: string | string[]
-  onAnswerChange: (questionId: string, value: string | string[]) => void
-}
-
-// Optimize QuestionComponent with deeper comparison
-const QuestionComponent = memo(
-  ({
-    question,
-    index,
-    currentAnswer,
-    onAnswerChange,
-  }: QuestionComponentProps) => {
-    const handleMcqChange = useCallback(
-      (value: string) => {
-        onAnswerChange(question.id, value)
-      },
-      [question.id, onAnswerChange]
-    )
-
-    const handleMultiSelectChange = useCallback(
-      (optionId: string, checked: boolean) => {
-        const currentAnswers = Array.isArray(currentAnswer) ? currentAnswer : []
-        if (checked) {
-          onAnswerChange(question.id, [...currentAnswers, optionId])
-        } else {
-          onAnswerChange(
-            question.id,
-            currentAnswers.filter((a) => a !== optionId)
-          )
-        }
-      },
-      [question.id, currentAnswer, onAnswerChange]
-    )
-
-    const handleTextChange = useCallback(
-      (value: string) => {
-        onAnswerChange(question.id, value)
-      },
-      [question.id, onAnswerChange]
-    )
-
-    return (
-      <div className='bg-white rounded-xl shadow-sm p-6 sm:p-8 border border-gray-100'>
-        <div className='flex items-start gap-6 mb-8'>
-          <div className='bg-red-600 text-white text-lg font-bold w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0'>
-            {index + 1}
-          </div>
-          <div className='flex-1'>
-            <h3 className='text-xl font-semibold text-gray-900 mb-4 leading-relaxed'>
-              {question.question}
-            </h3>
-            {question.points && (
-              <span className='inline-block bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1 rounded-full'>
-                {question.points} points
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className='ml-18'>
-          {/* Multiple Choice Question */}
-          {question.type === 'mcq' && question.options && (
-            <div className='space-y-4'>
-              {question.options.map((option) => (
-                <label
-                  key={option.id}
-                  className='flex items-center gap-4 cursor-pointer p-4 rounded-lg hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300 transition-all duration-200'
-                >
-                  <input
-                    type='radio'
-                    id={`${question.id}-${option.id}`}
-                    name={question.id}
-                    value={option.id}
-                    checked={currentAnswer === option.id}
-                    onChange={(e) => handleMcqChange(e.target.value)}
-                    className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 cursor-pointer'
-                  />
-                  <span className='text-gray-800 font-medium'>
-                    {option.text}
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
-
-          {/* Multi-Select Question */}
-          {question.type === 'multi_select' && question.options && (
-            <div className='space-y-4'>
-              {question.options.map((option) => (
-                <label
-                  key={option.id}
-                  className='flex items-center gap-4 cursor-pointer p-4 rounded-lg hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300 transition-all duration-200'
-                >
-                  <input
-                    type='checkbox'
-                    value={option.id}
-                    checked={
-                      Array.isArray(currentAnswer) &&
-                      currentAnswer.includes(option.id)
-                    }
-                    onChange={(e) => {
-                      handleMultiSelectChange(option.id, e.target.checked)
-                    }}
-                    className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 rounded cursor-pointer'
-                  />
-                  <span className='text-gray-800 font-medium'>
-                    {option.text}
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
-
-          {/* Text Question */}
-          {question.type === 'text' && (
-            <div className='max-w-3xl'>
-              <textarea
-                value={typeof currentAnswer === 'string' ? currentAnswer : ''}
-                onChange={(e) => handleTextChange(e.target.value)}
-                placeholder='Enter your answer here...'
-                maxLength={question.max_length}
-                className='w-full p-4 bg-gray-50 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:bg-white resize-none text-gray-800 transition-all duration-200'
-                rows={6}
-              />
-              {question.max_length && (
-                <div className='mt-3 text-sm text-gray-500 text-right font-medium'>
-                  {typeof currentAnswer === 'string' ? currentAnswer.length : 0}{' '}
-                  / {question.max_length} characters
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-)
-
-QuestionComponent.displayName = 'QuestionComponent'
 
 export default function TestPage() {
   const params = useParams()
@@ -177,9 +32,7 @@ export default function TestPage() {
   const sessionId = searchParams.get('sessionId')
   const [answers, setAnswers] = useState<Answer[]>([])
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
-  const [isInitialized, setIsInitialized] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Fullscreen functionality
   const enterFullscreen = useCallback(async () => {
@@ -304,16 +157,19 @@ export default function TestPage() {
       setTimeRemaining(currentTest.duration_minutes * 60) // Convert to seconds
     }
 
-    // Initialize answers if test is loaded but answers aren't initialized yet
-    if (currentTest?.questions && currentTest.id === testId && !isInitialized) {
+    // Ensure answers are initialized when we have test data but no answers yet
+    if (
+      currentTest?.questions &&
+      currentTest.id === testId &&
+      answers.length === 0
+    ) {
       const initialAnswers = currentTest.questions.map((q: Question) => ({
         questionId: q.id,
         answer: q.type === 'multi_select' ? [] : '',
       }))
       setAnswers(initialAnswers)
-      setIsInitialized(true)
     }
-  }, [testId, currentTest, sessionId, router, setError, isInitialized])
+  }, [testId, currentTest, sessionId, router, setError, answers.length])
 
   const fetchTestData = async (id: string) => {
     setLoading(true)
@@ -341,7 +197,6 @@ export default function TestPage() {
           answer: q.type === 'multi_select' ? [] : '',
         }))
         setAnswers(initialAnswers)
-        setIsInitialized(true)
       }
     } catch (error: any) {
       setError(error.message || 'Test not found')
@@ -350,19 +205,6 @@ export default function TestPage() {
       }, 3000)
     }
   }
-
-  const handleAnswerChange = useCallback(
-    (questionId: string, value: string | string[]) => {
-      setAnswers((prev) =>
-        prev.map((answer) =>
-          answer.questionId === questionId
-            ? { ...answer, answer: value }
-            : answer
-        )
-      )
-    },
-    []
-  ) // Remove answers dependency to prevent re-renders
 
   const handleSubmit = useCallback(async () => {
     console.log('Test submitted:', answers)
@@ -420,7 +262,7 @@ export default function TestPage() {
     }
   }, [timeRemaining, handleSubmit])
 
-  const handleReset = useCallback(() => {
+  const handleReset = () => {
     if (
       confirm(
         'Are you sure you want to reset all your answers? This action cannot be undone.'
@@ -432,43 +274,24 @@ export default function TestPage() {
           answer: q.type === 'multi_select' ? [] : '',
         }))
         setAnswers(resetAnswers)
-        setIsInitialized(true)
       }
     }
-  }, [currentTest])
+  }
 
-  const formatTime = useCallback((seconds: number) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
-  }, [])
+  }
 
-  // Memoize the questions to prevent re-rendering every second
-  const memoizedQuestions = useMemo(() => {
-    if (
-      !currentTest?.questions ||
-      currentTest.questions.length === 0 ||
-      !isInitialized
-    ) {
-      return null
-    }
-
-    return currentTest.questions.map((question: Question, index: number) => {
-      const currentAnswer =
-        answers.find((a) => a.questionId === question.id)?.answer ||
-        (question.type === 'multi_select' ? [] : '')
-
-      return (
-        <QuestionComponent
-          key={question.id}
-          question={question}
-          index={index}
-          currentAnswer={currentAnswer}
-          onAnswerChange={handleAnswerChange}
-        />
+  // Simple answer change handler
+  const handleAnswerChange = (questionId: string, value: string | string[]) => {
+    setAnswers((prev) =>
+      prev.map((answer) =>
+        answer.questionId === questionId ? { ...answer, answer: value } : answer
       )
-    })
-  }, [currentTest?.questions, answers, handleAnswerChange, isInitialized])
+    )
+  }
 
   if (isLoading) {
     return (
@@ -606,13 +429,29 @@ export default function TestPage() {
         </div>
 
         {/* Questions */}
-        {!isInitialized ? (
+        {currentTest?.questions && currentTest.questions.length > 0 ? (
+          <div className='space-y-8'>
+            {currentTest.questions.map((question: Question, index: number) => {
+              const currentAnswer =
+                answers.find((a) => a.questionId === question.id)?.answer ||
+                (question.type === 'multi_select' ? [] : '')
+
+              return (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  index={index}
+                  currentAnswer={currentAnswer}
+                  onAnswerChange={handleAnswerChange}
+                />
+              )
+            })}
+          </div>
+        ) : isLoading ? (
           <div className='bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center'>
             <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4'></div>
             <p className='text-gray-600 font-medium'>Preparing questions...</p>
           </div>
-        ) : memoizedQuestions ? (
-          <div className='space-y-8'>{memoizedQuestions}</div>
         ) : (
           <div className='bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center'>
             <p className='text-gray-600'>No questions available.</p>
@@ -620,7 +459,7 @@ export default function TestPage() {
         )}
 
         {/* Action Buttons */}
-        {isInitialized && (
+        {currentTest?.questions && currentTest.questions.length > 0 && (
           <div className='mt-12 bg-white rounded-xl shadow-sm p-6 sm:p-8 border border-gray-100'>
             <div className='flex flex-col sm:flex-row gap-4 justify-center max-w-sm mx-auto'>
               <button
