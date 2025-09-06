@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTestStore } from '@/store/testStore'
 import { useEffect } from 'react'
-import Container from '@/components/Container'
+import { Container, Button, LoadingSpinner } from '@/components'
 
 export default function TestInstructionsPage() {
   const router = useRouter()
@@ -21,7 +21,8 @@ export default function TestInstructionsPage() {
 
   const handleProceedToTest = () => {
     if (testId) {
-      router.push(`/tests/${testId}`)
+      // Redirect to user details page instead of directly to test
+      router.push(`/tests/user-details?id=${testId}`)
     }
   }
 
@@ -32,17 +33,14 @@ export default function TestInstructionsPage() {
   if (!testId || !currentTest) {
     return (
       <div className='min-h-screen bg-white flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Redirecting...</p>
-        </div>
+        <LoadingSpinner size='lg' text='Redirecting...' />
       </div>
     )
   }
 
   return (
     <div className='min-h-screen bg-gray-50 py-8 sm:py-12'>
-      <Container size='sm'>
+      <Container size='lg'>
         {/* Header Section */}
         <div className='mb-8 sm:mb-12 text-center'>
           <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600 mb-2 sm:mb-4'>
@@ -192,25 +190,24 @@ export default function TestInstructionsPage() {
 
         {/* Action Buttons */}
         <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center'>
-          <button
-            onClick={handleGoBack}
-            className='w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors text-sm sm:text-base'
-          >
+          <Button variant='secondary' onClick={handleGoBack} fullWidth>
             Go Back
-          </button>
-          <button
+          </Button>
+          <Button
+            variant='primary'
+            size='lg'
             onClick={handleProceedToTest}
-            className='w-full sm:w-auto px-6 sm:px-8 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors text-sm sm:text-base'
+            fullWidth
           >
-            I Understand - Proceed to Test
-          </button>
+            I Understand - Continue
+          </Button>
         </div>
 
         {/* Disclaimer */}
         <div className='mt-4 sm:mt-6 text-center'>
           <p className='text-xs sm:text-sm text-gray-500 px-4 sm:px-0'>
-            By clicking "Proceed to Test", you acknowledge that you have read
-            and agree to follow all test rules.
+            By clicking "Continue", you acknowledge that you have read and agree
+            to follow all test rules.
           </p>
         </div>
       </Container>

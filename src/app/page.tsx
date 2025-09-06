@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTestStore } from '@/store/testStore'
-import Container from '@/components/Container'
+import { Container, Input, Button, Alert } from '@/components'
 
 export default function Home() {
   const [testId, setTestId] = useState('')
@@ -61,29 +61,26 @@ export default function Home() {
 
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='flex flex-col sm:flex-row gap-3'>
-              <input
+              <Input
                 type='text'
                 value={testId}
                 onChange={(e) => setTestId(e.target.value)}
                 placeholder='Enter test UUID'
-                className='flex-1 px-4 py-3 border-2 border-red-200 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-colors text-sm sm:text-base'
                 required
                 disabled={isLoading}
+                className='flex-1 border-2 border-red-200 focus:border-red-500 focus:ring-red-200'
               />
-              <button
+              <Button
                 type='submit'
                 disabled={isLoading}
-                className='px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base whitespace-nowrap'
+                loading={isLoading}
+                className='whitespace-nowrap'
               >
                 {isLoading ? 'Loading...' : 'Send'}
-              </button>
+              </Button>
             </div>
 
-            {error && (
-              <div className='mt-4 p-3 bg-red-50 border border-red-200 rounded-lg'>
-                <p className='text-red-600 text-sm'>{error}</p>
-              </div>
-            )}
+            {error && <Alert variant='error'>{error}</Alert>}
           </form>
         </div>
       </Container>

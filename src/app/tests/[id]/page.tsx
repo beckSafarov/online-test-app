@@ -1,9 +1,9 @@
 'use client'
 
 import { useTestStore, Question } from '@/store/testStore'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import Container from '@/components/Container'
+import { Container, Button, LoadingSpinner, Alert } from '@/components'
 
 interface Answer {
   questionId: string
@@ -13,6 +13,7 @@ interface Answer {
 export default function TestPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const {
     currentTest,
     setCurrentTest,
@@ -22,18 +23,26 @@ export default function TestPage() {
     error,
   } = useTestStore()
   const testId = params.id as string
+  const sessionId = searchParams.get('sessionId')
   const [answers, setAnswers] = useState<Answer[]>([])
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
 
   useEffect(() => {
-    // If no test data in store, try to fetch it
-    if (!currentTest && testId) {
+    // Validate session ID - redirect if missing
+    if (!sessionId) {
+      setError('Invalid session. Please start the test again.')
+      router.push('/')
+      return
+    }
+
+    // Always fetch test data when testId changes or if we don't have the right test
+    if (testId && (!currentTest || currentTest.id !== testId)) {
       fetchTestData(testId)
-    } else if (currentTest?.duration_minutes) {
-      // Start timer if test has duration
+    } else if (currentTest?.duration_minutes && currentTest.id === testId) {
+      // Start timer if test has duration and matches current testId
       setTimeRemaining(currentTest.duration_minutes * 60) // Convert to seconds
     }
-  }, [testId, currentTest])
+  }, [testId, currentTest, sessionId, router, setError])
 
   useEffect(() => {
     // Timer countdown
@@ -50,6 +59,7 @@ export default function TestPage() {
 
   const fetchTestData = async (id: string) => {
     setLoading(true)
+    setError(null) // Clear any previous errors
     try {
       const response = await fetch(`/api/questions/${id}`)
       const data = await response.json()
@@ -59,6 +69,7 @@ export default function TestPage() {
       }
 
       setCurrentTest(data)
+      setLoading(false) // Set loading to false after successful fetch
 
       // Initialize answers array
       if (data.questions) {
@@ -79,9 +90,7 @@ export default function TestPage() {
   const handleAnswerChange = (questionId: string, value: string | string[]) => {
     setAnswers((prev) =>
       prev.map((answer) =>
-        answer.questionId === questionId
-          ? { ...answer, answer: value }
-          : answer
+        answer.questionId === questionId ? { ...answer, answer: value } : answer
       )
     )
   }
@@ -129,7 +138,7 @@ export default function TestPage() {
   if (error || !currentTest) {
     return (
       <div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
-        <Container size='md'>
+        <Container size='lg'>
           <div className='text-center bg-white rounded-xl shadow-sm p-8 border border-gray-100'>
             <h1 className='text-2xl font-bold text-red-600 mb-4'>
               Test Not Found
@@ -157,7 +166,7 @@ export default function TestPage() {
       <Container size='md'>
         {/* Header */}
         <div className='bg-white rounded-xl shadow-sm p-6 sm:p-8 mb-8 border border-gray-100'>
-          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6'>
+          <div className='flex sm:flex-row sm:items-center sm:justify-between mb-6'>
             <button
               onClick={() => router.push('/')}
               className='text-red-600 hover:text-red-700 mb-4 sm:mb-0 flex items-center gap-2 text-sm font-medium transition-colors'
@@ -193,25 +202,19 @@ export default function TestPage() {
             )}
           </div>
 
-          <div className='flex flex-wrap justify-center gap-6 text-sm text-gray-600 bg-gray-50 rounded-lg p-6'>
-            <div className='flex items-center gap-2'>
-              <span className='font-medium'>Test ID:</span>
-              <code className='bg-white px-3 py-1 rounded border font-mono text-gray-800'>
-                {testId}
-              </code>
-            </div>
+          <div className='flex flex-col sm:flex-row gap-4 items-center justify-center text-sm text-gray-600 bg-gray-50 rounded-lg p-6'>
             {currentTest.questions && (
-              <div className='flex items-center gap-2'>
-                <span className='font-medium'>Questions:</span>
-                <span className='font-semibold text-gray-800'>
+              <div className='flex items-center justify-between'>
+                <div className='font-medium text-gray-700'>❓ Questions:</div>
+                <div className='font-bold text-gray-800 bg-green-100 px-3 py-1 rounded-full'>
                   {currentTest.questions.length}
-                </span>
+                </div>
               </div>
             )}
             {currentTest.duration_minutes && (
-              <div className='flex items-center gap-2'>
-                <span className='font-medium'>Duration:</span>
-                <span className='font-semibold text-gray-800'>
+              <div className='flex items-center justify-between'>
+                <span className='font-medium text-gray-700'>⌛️ Duration:</span>
+                <span className='font-bold text-gray-800 bg-green-100 px-3 py-1 rounded-full'>
                   {currentTest.duration_minutes} minutes
                 </span>
               </div>
@@ -265,7 +268,7 @@ export default function TestPage() {
                               onChange={(e) =>
                                 handleAnswerChange(question.id, e.target.value)
                               }
-                              className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2'
+                              className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 cursor-pointer'
                             />
                             <span className='text-gray-800 font-medium'>
                               {option.text}
@@ -310,7 +313,7 @@ export default function TestPage() {
                                   )
                                 }
                               }}
-                              className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 rounded'
+                              className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 rounded cursor-pointer'
                             />
                             <span className='text-gray-800 font-medium'>
                               {option.text}
