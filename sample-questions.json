@@ -1,0 +1,43 @@
+[
+  {
+    "title":"",
+    "description":"",
+    "questions":[
+      {
+        "id": "q1",
+        "type": "mcq",
+        "question": "What is the most important skill for a sales agent?",
+        "options": [
+          { "id": "a", "text": "Communication" },
+          { "id": "b", "text": "Technical knowledge" },
+          { "id": "c", "text": "Product knowledge" },
+          { "id": "d", "text": "Closing techniques" }
+        ],
+        "correct_answer": "a",
+        "points": 5
+      },
+      {
+        "id": "q2",
+        "type": "text",
+        "question": "Describe a challenging sales situation you've handled",
+        "max_length": 500,
+        "points": 10
+      },
+      {
+        "id": "q3",
+        "type": "multi_select",
+        "question": "Which CRM tools have you used? (Select all that apply)",
+        "options": [
+          { "id": "a", "text": "Salesforce" },
+          { "id": "b", "text": "HubSpot" },
+          { "id": "c", "text": "Pipedrive" },
+          { "id": "d", "text": "Zoho CRM" }
+        ],
+        "correct_answers": ["a", "b"], 
+        "points": 3
+      }
+    ],
+    "duration_minutes":10,
+    "admin_email":"admin@gmail.com"
+  }
+]
