@@ -2,13 +2,134 @@
 
 import { useTestStore, Question } from '@/store/testStore'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useMemo, useCallback, memo } from 'react'
 import { Container, Button, LoadingSpinner, Alert } from '@/components'
 
 interface Answer {
   questionId: string
   answer: string | string[]
 }
+
+interface QuestionComponentProps {
+  question: Question
+  index: number
+  answers: Answer[]
+  onAnswerChange: (questionId: string, value: string | string[]) => void
+}
+
+const QuestionComponent = memo(({ question, index, answers, onAnswerChange }: QuestionComponentProps) => {
+  const currentAnswer = answers.find((a) => a.questionId === question.id)?.answer ||
+    (question.type === 'multi_select' ? [] : '')
+
+  return (
+    <div className='bg-white rounded-xl shadow-sm p-6 sm:p-8 border border-gray-100'>
+      <div className='flex items-start gap-6 mb-8'>
+        <div className='bg-red-600 text-white text-lg font-bold w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0'>
+          {index + 1}
+        </div>
+        <div className='flex-1'>
+          <h3 className='text-xl font-semibold text-gray-900 mb-4 leading-relaxed'>
+            {question.question}
+          </h3>
+          {question.points && (
+            <span className='inline-block bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1 rounded-full'>
+              {question.points} points
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className='ml-18'>
+        {/* Multiple Choice Question */}
+        {question.type === 'mcq' && question.options && (
+          <div className='space-y-4'>
+            {question.options.map((option) => (
+              <label
+                key={option.id}
+                className='flex items-center gap-4 cursor-pointer p-4 rounded-lg hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300 transition-all duration-200'
+              >
+                <input
+                  type='radio'
+                  name={question.id}
+                  value={option.id}
+                  checked={currentAnswer === option.id}
+                  onChange={(e) => onAnswerChange(question.id, e.target.value)}
+                  className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 cursor-pointer'
+                />
+                <span className='text-gray-800 font-medium'>
+                  {option.text}
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {/* Multi-Select Question */}
+        {question.type === 'multi_select' && question.options && (
+          <div className='space-y-4'>
+            {question.options.map((option) => (
+              <label
+                key={option.id}
+                className='flex items-center gap-4 cursor-pointer p-4 rounded-lg hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300 transition-all duration-200'
+              >
+                <input
+                  type='checkbox'
+                  value={option.id}
+                  checked={
+                    Array.isArray(currentAnswer) &&
+                    currentAnswer.includes(option.id)
+                  }
+                  onChange={(e) => {
+                    const currentAnswerArray = Array.isArray(currentAnswer)
+                      ? currentAnswer
+                      : []
+                    if (e.target.checked) {
+                      onAnswerChange(question.id, [
+                        ...currentAnswerArray,
+                        option.id,
+                      ])
+                    } else {
+                      onAnswerChange(
+                        question.id,
+                        currentAnswerArray.filter((id) => id !== option.id)
+                      )
+                    }
+                  }}
+                  className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 rounded cursor-pointer'
+                />
+                <span className='text-gray-800 font-medium'>
+                  {option.text}
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {/* Text Question */}
+        {question.type === 'text' && (
+          <div className='max-w-3xl'>
+            <textarea
+              value={typeof currentAnswer === 'string' ? currentAnswer : ''}
+              onChange={(e) => onAnswerChange(question.id, e.target.value)}
+              placeholder='Enter your answer here...'
+              maxLength={question.max_length}
+              className='w-full p-4 bg-gray-50 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:bg-white resize-none text-gray-800 transition-all duration-200'
+              rows={6}
+            />
+            {question.max_length && (
+              <div className='mt-3 text-sm text-gray-500 text-right font-medium'>
+                {typeof currentAnswer === 'string' ? currentAnswer.length : 0}{' '}
+                / {question.max_length} characters
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+})
+
+QuestionComponent.displayName = 'QuestionComponent'
 
 export default function TestPage() {
   const params = useParams()
@@ -26,6 +147,7 @@ export default function TestPage() {
   const sessionId = searchParams.get('sessionId')
   const [answers, setAnswers] = useState<Answer[]>([])
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // Validate session ID - redirect if missing
@@ -38,17 +160,21 @@ export default function TestPage() {
     // Always fetch test data when testId changes or if we don't have the right test
     if (testId && (!currentTest || currentTest.id !== testId)) {
       fetchTestData(testId)
-    } else if (currentTest?.duration_minutes && currentTest.id === testId) {
-      // Start timer if test has duration and matches current testId
+    } else if (
+      currentTest?.duration_minutes &&
+      currentTest.id === testId &&
+      timeRemaining === null
+    ) {
+      // Start timer if test has duration and matches current testId, but only if timer isn't already set
       setTimeRemaining(currentTest.duration_minutes * 60) // Convert to seconds
     }
   }, [testId, currentTest, sessionId, router, setError])
 
+  // Timer management - optimized to prevent excessive re-renders
   useEffect(() => {
-    // Timer countdown
     if (timeRemaining !== null && timeRemaining > 0) {
       const timer = setTimeout(() => {
-        setTimeRemaining(timeRemaining - 1)
+        setTimeRemaining((prev) => (prev && prev > 0 ? prev - 1 : 0))
       }, 1000)
       return () => clearTimeout(timer)
     } else if (timeRemaining === 0) {
@@ -71,6 +197,11 @@ export default function TestPage() {
       setCurrentTest(data)
       setLoading(false) // Set loading to false after successful fetch
 
+      // Only initialize timer if it's not already set
+      if (data.duration_minutes && timeRemaining === null) {
+        setTimeRemaining(data.duration_minutes * 60)
+      }
+
       // Initialize answers array
       if (data.questions) {
         const initialAnswers = data.questions.map((q: Question) => ({
@@ -87,22 +218,44 @@ export default function TestPage() {
     }
   }
 
-  const handleAnswerChange = (questionId: string, value: string | string[]) => {
-    setAnswers((prev) =>
-      prev.map((answer) =>
-        answer.questionId === questionId ? { ...answer, answer: value } : answer
+  const handleAnswerChange = useCallback(
+    (questionId: string, value: string | string[]) => {
+      setAnswers((prev) =>
+        prev.map((answer) =>
+          answer.questionId === questionId
+            ? { ...answer, answer: value }
+            : answer
+        )
       )
-    )
-  }
+    },
+    []
+  ) // Remove answers dependency to prevent re-renders
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(async () => {
     // TODO: Submit answers to backend
     console.log('Test submitted:', answers)
-    alert('Test submitted successfully!')
-    router.push('/')
-  }
+    try {
+      const response = await fetch('/api/results', {
+        method: 'POST',
+        body: JSON.stringify({
+          session_id: sessionId,
+          answers: answers,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      // const data = await response.json()
+      alert('Test submitted successfully!')
+      router.push('/')
+    } catch (error) {
+      console.error('Error submitting test:', error)
+      alert('Error submitting test. Please try again.')
+      return
+    }
+  }, [answers, sessionId, router])
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     if (
       confirm(
         'Are you sure you want to reset all your answers? This action cannot be undone.'
@@ -116,13 +269,32 @@ export default function TestPage() {
         setAnswers(resetAnswers)
       }
     }
-  }
+  }, [currentTest])
 
-  const formatTime = (seconds: number) => {
+  const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+  }, [])
+
+  // Memoize the questions to prevent re-rendering every second
+  const memoizedQuestions = useMemo(() => {
+    if (!currentTest?.questions || currentTest.questions.length === 0) {
+      return null
+    }
+
+    return currentTest.questions.map((question: Question, index: number) => {
+      return (
+        <QuestionComponent
+          key={question.id}
+          question={question}
+          index={index}
+          answers={answers}
+          onAnswerChange={handleAnswerChange}
+        />
+      )
+    })
+  }, [currentTest?.questions, answers, handleAnswerChange])
 
   if (isLoading) {
     return (
@@ -223,137 +395,9 @@ export default function TestPage() {
         </div>
 
         {/* Questions */}
-        {currentTest.questions && currentTest.questions.length > 0 && (
+        {memoizedQuestions && (
           <div className='space-y-8'>
-            {currentTest.questions.map((question: Question, index: number) => {
-              const currentAnswer =
-                answers.find((a) => a.questionId === question.id)?.answer ||
-                (question.type === 'multi_select' ? [] : '')
-
-              return (
-                <div
-                  key={question.id}
-                  className='bg-white rounded-xl shadow-sm p-6 sm:p-8 border border-gray-100'
-                >
-                  <div className='flex items-start gap-6 mb-8'>
-                    <div className='bg-red-600 text-white text-lg font-bold w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0'>
-                      {index + 1}
-                    </div>
-                    <div className='flex-1'>
-                      <h3 className='text-xl font-semibold text-gray-900 mb-4 leading-relaxed'>
-                        {question.question}
-                      </h3>
-                      {question.points && (
-                        <span className='inline-block bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1 rounded-full'>
-                          {question.points} points
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className='ml-18'>
-                    {/* Multiple Choice Question */}
-                    {question.type === 'mcq' && question.options && (
-                      <div className='space-y-4'>
-                        {question.options.map((option) => (
-                          <label
-                            key={option.id}
-                            className='flex items-center gap-4 cursor-pointer p-4 rounded-lg hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300 transition-all duration-200'
-                          >
-                            <input
-                              type='radio'
-                              name={question.id}
-                              value={option.id}
-                              checked={currentAnswer === option.id}
-                              onChange={(e) =>
-                                handleAnswerChange(question.id, e.target.value)
-                              }
-                              className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 cursor-pointer'
-                            />
-                            <span className='text-gray-800 font-medium'>
-                              {option.text}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Multi-Select Question */}
-                    {question.type === 'multi_select' && question.options && (
-                      <div className='space-y-4'>
-                        {question.options.map((option) => (
-                          <label
-                            key={option.id}
-                            className='flex items-center gap-4 cursor-pointer p-4 rounded-lg hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-300 transition-all duration-200'
-                          >
-                            <input
-                              type='checkbox'
-                              value={option.id}
-                              checked={
-                                Array.isArray(currentAnswer) &&
-                                currentAnswer.includes(option.id)
-                              }
-                              onChange={(e) => {
-                                const currentAnswerArray = Array.isArray(
-                                  currentAnswer
-                                )
-                                  ? currentAnswer
-                                  : []
-                                if (e.target.checked) {
-                                  handleAnswerChange(question.id, [
-                                    ...currentAnswerArray,
-                                    option.id,
-                                  ])
-                                } else {
-                                  handleAnswerChange(
-                                    question.id,
-                                    currentAnswerArray.filter(
-                                      (id) => id !== option.id
-                                    )
-                                  )
-                                }
-                              }}
-                              className='w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 rounded cursor-pointer'
-                            />
-                            <span className='text-gray-800 font-medium'>
-                              {option.text}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Text Question */}
-                    {question.type === 'text' && (
-                      <div className='max-w-3xl'>
-                        <textarea
-                          value={
-                            typeof currentAnswer === 'string'
-                              ? currentAnswer
-                              : ''
-                          }
-                          onChange={(e) =>
-                            handleAnswerChange(question.id, e.target.value)
-                          }
-                          placeholder='Enter your answer here...'
-                          maxLength={question.max_length}
-                          className='w-full p-4 bg-gray-50 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:bg-white resize-none text-gray-800 transition-all duration-200'
-                          rows={6}
-                        />
-                        {question.max_length && (
-                          <div className='mt-3 text-sm text-gray-500 text-right font-medium'>
-                            {typeof currentAnswer === 'string'
-                              ? currentAnswer.length
-                              : 0}{' '}
-                            / {question.max_length} characters
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
+            {memoizedQuestions}
           </div>
         )}
 
