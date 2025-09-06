@@ -5,6 +5,33 @@ import { useTestStore } from '@/store/testStore'
 import { useEffect } from 'react'
 import { Container, Button, LoadingSpinner } from '@/components'
 
+const test_rules_test = [
+  {
+    strong: 'No Cheating:',
+    text: ' Any form of cheating, including using unauthorized resources or collaborating with others, is strictly prohibited and will result in immediate disqualification.',
+  },
+  {
+    strong: 'No Tab/App Switching:',
+    text: ' Switching to other browser tabs, applications, or leaving the test window will result in automatic test failure.',
+  },
+  {
+    strong: 'Full Screen Mode:',
+    text: ' The test must be taken in full screen mode. Exiting full screen will terminate the test.',
+  },
+  {
+    strong: 'Time Limit:',
+    text: ' Complete the test within the allocated time. The test will auto-submit when time expires.',
+  },
+  {
+    strong: 'Single Attempt.',
+    text: 'You have only one attempt to complete this test. Once started, you cannot restart.',
+  },
+  {
+    strong: 'Technical Requirements.',
+    text: 'Ensure stable internet connection. Technical issues during the test may not allow for retakes.',
+  },
+]
+
 export default function TestInstructionsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -90,90 +117,21 @@ export default function TestInstructionsPage() {
             Test Rules & Guidelines
           </h3>
 
-          <div className='space-y-4 sm:space-y-6'>
-            <div className='flex items-start'>
-              <div className='flex-shrink-0 mt-1'>
-                <div className='w-2 h-2 bg-red-600 rounded-full'></div>
+          {test_rules_test.map(
+            (rule: { strong: string; text: string }, index: number) => (
+              <div key={index} className='flex items-start'>
+                <div className='flex-shrink-0 mt-1'>
+                  <div className='w-2 h-2 bg-red-600 rounded-full'></div>
+                </div>
+                <div className='ml-3 sm:ml-4'>
+                  <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
+                    <strong className='text-gray-900'>{rule.strong}</strong>{' '}
+                    {rule.text}
+                  </p>
+                </div>
               </div>
-              <div className='ml-3 sm:ml-4'>
-                <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>No Cheating:</strong> Any
-                  form of cheating, including using external resources,
-                  collaborating with others, or using unauthorized materials is
-                  strictly prohibited.
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-start'>
-              <div className='flex-shrink-0 mt-1'>
-                <div className='w-2 h-2 bg-red-600 rounded-full'></div>
-              </div>
-              <div className='ml-3 sm:ml-4'>
-                <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>
-                    No Tab/App Switching:
-                  </strong>{' '}
-                  Switching to other browser tabs, applications, or leaving the
-                  test window will result in automatic test failure.
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-start'>
-              <div className='flex-shrink-0 mt-1'>
-                <div className='w-2 h-2 bg-red-600 rounded-full'></div>
-              </div>
-              <div className='ml-3 sm:ml-4'>
-                <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>Full Screen Mode:</strong>{' '}
-                  The test must be taken in full screen mode. Exiting full
-                  screen will terminate the test.
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-start'>
-              <div className='flex-shrink-0 mt-1'>
-                <div className='w-2 h-2 bg-red-600 rounded-full'></div>
-              </div>
-              <div className='ml-3 sm:ml-4'>
-                <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>Time Limit:</strong>{' '}
-                  Complete the test within the allocated time. The test will
-                  auto-submit when time expires.
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-start'>
-              <div className='flex-shrink-0 mt-1'>
-                <div className='w-2 h-2 bg-red-600 rounded-full'></div>
-              </div>
-              <div className='ml-3 sm:ml-4'>
-                <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>Single Attempt:</strong> You
-                  have only one attempt to complete this test. Once started, you
-                  cannot restart.
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-start'>
-              <div className='flex-shrink-0 mt-1'>
-                <div className='w-2 h-2 bg-red-600 rounded-full'></div>
-              </div>
-              <div className='ml-3 sm:ml-4'>
-                <p className='text-sm sm:text-base text-gray-700 leading-relaxed'>
-                  <strong className='text-gray-900'>
-                    Technical Requirements:
-                  </strong>{' '}
-                  Ensure stable internet connection. Technical issues during the
-                  test may not allow for retakes.
-                </p>
-              </div>
-            </div>
-          </div>
+            )
+          )}
         </div>
 
         {/* Consequences Section */}
