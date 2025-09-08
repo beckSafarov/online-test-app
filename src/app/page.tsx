@@ -4,28 +4,13 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTestStore } from '@/store/testStore'
 import { Container, Input, Button, Alert } from '@/components'
+import { fetch_test } from '@/utils/api_client'
 
 export default function Home() {
   const [testId, setTestId] = useState('')
   const router = useRouter()
   const { setCurrentTest, setLoading, setError, isLoading, error } =
     useTestStore()
-
-  const fetch_test = async (id: string) => {
-    try {
-      const response = await fetch(`/api/questions/${id}`)
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch test')
-      }
-
-      return data
-    } catch (error) {
-      console.error('Error fetching test:', error)
-      throw error
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

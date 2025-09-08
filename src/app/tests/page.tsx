@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useTestStore } from '@/store/testStore'
 import { useEffect } from 'react'
 import { Container, Button, LoadingSpinner } from '@/components'
+import { fetch_test } from '@/utils/api_client'
 
 const test_rules_test = [
   {
@@ -36,15 +37,37 @@ export default function TestInstructionsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const testId = searchParams.get('id')
-  const { currentTest, setError } = useTestStore()
+  const { currentTest, setError, setLoading, isLoading } = useTestStore()
 
   useEffect(() => {
     // If no test ID or no test data, redirect to home
-    if (!testId || !currentTest) {
-      setError('Please enter a valid test ID from the home page.')
+    if (testId && !currentTest) handleFetchTest()
+    if (!testId && !currentTest) {
+      setError('Please enter a valid test ID.')
       router.push('/')
     }
   }, [testId, currentTest, router, setError])
+
+  const handleFetchTest = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch_test(testId)
+      if (res) {
+        useTestStore.getState().setCurrentTest(res)
+      } else {
+        setError(
+          'Test not found. Please enter a valid test ID from the home page.'
+        )
+        router.push('/')
+      }
+    } catch (error) {
+      console.error('Error fetching test:', error)
+      setError('Error fetching test. Please try again later.')
+      router.push('/')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleProceedToTest = () => {
     if (testId) {
@@ -57,7 +80,7 @@ export default function TestInstructionsPage() {
     router.push('/')
   }
 
-  if (!testId || !currentTest) {
+  if (!testId || !currentTest || isLoading) {
     return (
       <div className='min-h-screen bg-white flex items-center justify-center'>
         <LoadingSpinner size='lg' text='Redirecting...' />
