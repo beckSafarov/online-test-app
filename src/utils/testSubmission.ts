@@ -55,7 +55,8 @@ export async function endTestSession(
         test_id: testId,
         did_violate: didViolate,
         is_completed: isCompleted,
-        submitted_at: new Date().toISOString()
+        submitted_at: new Date().toISOString(),
+        is_open: false,
       }),
     })
 

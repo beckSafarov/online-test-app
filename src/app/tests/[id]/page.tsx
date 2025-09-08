@@ -17,6 +17,7 @@ import {
   terminateTestForViolation,
   completeTestNormally,
 } from '@/utils/testSubmission'
+import { checkSessionStatus } from '@/utils/api_client'
 
 interface Answer {
   questionId: string
@@ -210,7 +211,7 @@ export default function TestPage() {
 
     // Always fetch test data when testId changes or if we don't have the right test
     if (testId && (!currentTest || currentTest.id !== testId)) {
-      fetchTestData(testId)
+      handleReload()
     } else if (
       currentTest?.duration_minutes &&
       currentTest.id === testId &&
@@ -233,6 +234,23 @@ export default function TestPage() {
       setAnswers(initialAnswers)
     }
   }, [testId, currentTest, sessionId, router, setError, answers.length])
+
+  const handleReload = async () => {
+    setLoading(true)
+    const { success, isOpen, error } = await checkSessionStatus(sessionId || '')
+    if (!success) {
+      console.error(error)
+      setError('Problem with fetching the session data. Please try again')
+      setLoading(false)
+      return
+    }
+    if (!isOpen) {
+      router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
+      return
+    }
+    setLoading(false)
+    return await fetchTestData(testId)
+  }
 
   const fetchTestData = async (id: string) => {
     setLoading(true)
@@ -285,15 +303,16 @@ export default function TestPage() {
       console.log('Submitting test with answers:', formattedAnswers)
       await completeTestNormally(testId, sessionId, formattedAnswers)
       console.log('Test submission completed successfully')
-      
+
       // Navigate to results page immediately after successful submission
       router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
     } catch (error) {
       console.error('Error submitting test:', error)
-      
+
       // Show a more specific error message to the user
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred'
+
       if (errorMessage.includes('Failed to fetch test data')) {
         // This is likely a submission success but API fetch issue after submission
         console.log('Submission likely succeeded, redirecting to results...')

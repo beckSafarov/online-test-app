@@ -68,7 +68,14 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const { submitted_at, is_completed, did_violate, sessionId, test_id } = body
+    const {
+      submitted_at,
+      is_completed,
+      did_violate,
+      sessionId,
+      test_id,
+      is_open,
+    } = body
 
     // Validate required fields
     if (!submitted_at || !sessionId || !test_id) {
@@ -86,6 +93,7 @@ export async function PUT(request: NextRequest) {
         is_completed: Boolean(is_completed),
         did_violate: Boolean(did_violate),
         test_id: test_id,
+        is_open: Boolean(is_open),
       })
       .eq('id', sessionId)
       .select()
