@@ -62,9 +62,9 @@ export async function PUT(request: NextRequest) {
     const { submitted_at, is_completed, did_violate, sessionId, test_id } = body
 
     // Validate required fields
-    if (!submitted_at || !is_completed || !did_violate || !test_id) {
+    if (!submitted_at || !sessionId || !test_id) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: submitted_at, sessionId, test_id' },
         { status: 400 }
       )
     }

@@ -2,7 +2,7 @@
 
 import { useTestStore, Question } from '@/store/testStore'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import {
   Container,
   FullscreenIcon,
@@ -10,6 +10,13 @@ import {
   BackArrowIcon,
 } from '@/components'
 import QuestionCard from '@/components/forms/QuestionCard'
+import ViolationWarning from '@/components/ui/ViolationWarning'
+import TestTerminatedModal from '@/components/ui/TestTerminatedModal'
+import { TestMonitor } from '@/utils/testMonitor'
+import {
+  terminateTestForViolation,
+  completeTestNormally,
+} from '@/utils/testSubmission'
 
 interface Answer {
   questionId: string
@@ -33,6 +40,13 @@ export default function TestPage() {
   const [answers, setAnswers] = useState<Answer[]>([])
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [violations, setViolations] = useState(0)
+  const [showViolationWarning, setShowViolationWarning] = useState(false)
+  const [showTerminatedModal, setShowTerminatedModal] = useState(false)
+  const [terminationReason, setTerminationReason] = useState<
+    'timeout' | 'violations'
+  >('timeout')
+  const testMonitorRef = useRef<TestMonitor | null>(null)
 
   // Fullscreen functionality
   const enterFullscreen = useCallback(async () => {
@@ -56,6 +70,55 @@ export default function TestPage() {
       console.warn('Fullscreen exit failed:', error)
     }
   }, [])
+
+  // Test monitoring and violation tracking
+  const handleViolation = useCallback((newViolations: number) => {
+    setViolations(newViolations)
+    setShowViolationWarning(true)
+  }, [])
+
+  const handleTestTerminated = useCallback(
+    async (reason: 'timeout' | 'violations') => {
+      if (!sessionId || !testId) return
+
+      try {
+        // Convert answers to the format expected by the API
+        const formattedAnswers = answers.map((answer) => ({
+          questionId: answer.questionId,
+          answer: answer.answer,
+        }))
+
+        await terminateTestForViolation(testId, sessionId, formattedAnswers)
+
+        setTerminationReason(reason)
+        setShowTerminatedModal(true)
+      } catch (error) {
+        console.error('Error terminating test:', error)
+        // Still show the modal even if submission fails
+        setTerminationReason(reason)
+        setShowTerminatedModal(true)
+      }
+    },
+    [testId, sessionId, answers]
+  )
+
+  // Initialize test monitor
+  useEffect(() => {
+    if (!currentTest || !sessionId) return
+
+    const monitor = new TestMonitor({
+      onViolation: handleViolation,
+      onTestTerminated: handleTestTerminated,
+    })
+
+    monitor.init()
+    testMonitorRef.current = monitor
+
+    return () => {
+      monitor.destroy()
+      testMonitorRef.current = null
+    }
+  }, [currentTest, sessionId, handleViolation, handleTestTerminated])
 
   // Handle fullscreen change events
   useEffect(() => {
@@ -206,48 +269,40 @@ export default function TestPage() {
     }
   }
 
-  const handleSubmit = useCallback(async () => {
-    console.log('Test submitted:', answers)
-    try {
-      await fetch('/api/results', {
-        method: 'POST',
-        body: JSON.stringify({
-          session_id: sessionId,
-          answers: answers,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      await fetch('/api/test_session', {
-        method: 'PUT',
-        body: JSON.stringify({
-          test_id: testId,
-          submitted_at: new Date().toISOString(),
-          is_completed: 'true',
-          did_violate: 'false', // This would be dynamic based on actual monitoring
-          sessionId: sessionId,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      // const data = await response.json()
-
-      // Exit fullscreen before showing alert and redirecting
-      if (document.fullscreenElement) {
-        await exitFullscreen()
-      }
-
-      alert('Test submitted successfully!')
-      router.push('/')
-    } catch (error) {
-      console.error('Error submitting test:', error)
-      alert('Error submitting test. Please try again.')
+  const handleSubmit = async () => {
+    if (!sessionId || !testId) {
+      console.error('Missing sessionId or testId for submission')
       return
     }
-  }, [answers, sessionId, router, exitFullscreen])
+
+    try {
+      // Convert answers to the format expected by the API
+      const formattedAnswers = answers.map((answer) => ({
+        questionId: answer.questionId,
+        answer: answer.answer,
+      }))
+
+      await completeTestNormally(testId, sessionId, formattedAnswers)
+      router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
+    } catch (error) {
+      console.error('Error submitting test:', error)
+      // Still redirect to results page even if submission fails
+      router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
+    }
+  }
+
+  const handleViolationWarningClose = () => {
+    setShowViolationWarning(false)
+
+    // If this was the final warning (3rd violation), terminate the test
+    if (violations >= 3 && testMonitorRef.current) {
+      testMonitorRef.current.terminateAfterFinalWarning()
+    }
+  }
+
+  const handleGoHome = () => {
+    router.push('/')
+  }
 
   // Timer management - optimized to prevent excessive re-renders
   useEffect(() => {
@@ -260,7 +315,7 @@ export default function TestPage() {
       // Auto-submit when time runs out
       handleSubmit()
     }
-  }, [timeRemaining, handleSubmit])
+  }, [timeRemaining]) // Removed handleSubmit from dependencies to avoid infinite loop
 
   const handleReset = () => {
     if (
@@ -485,6 +540,20 @@ export default function TestPage() {
           </div>
         )}
       </Container>
+
+      {/* Violation Warning Modal */}
+      <ViolationWarning
+        violations={violations}
+        isVisible={showViolationWarning}
+        onClose={handleViolationWarningClose}
+      />
+
+      {/* Test Terminated Modal */}
+      <TestTerminatedModal
+        reason={terminationReason}
+        isVisible={showTerminatedModal}
+        onGoHome={handleGoHome}
+      />
     </div>
   )
 }
