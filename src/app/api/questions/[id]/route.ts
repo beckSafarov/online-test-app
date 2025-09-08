@@ -27,9 +27,18 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Supabase error:', error)
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
       return NextResponse.json(
-        { error: 'Failed to fetch test data' },
+        { 
+          error: 'Failed to fetch test data',
+          details: error.message,
+          code: error.code
+        },
         { status: 500 }
       )
     }

@@ -38,9 +38,18 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Supabase error:', error)
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
       return NextResponse.json(
-        { error: 'Failed to create test session' },
+        { 
+          error: 'Failed to create test session',
+          details: error.message,
+          code: error.code
+        },
         { status: 500 }
       )
     }
@@ -83,9 +92,18 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Supabase error:', error)
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
       return NextResponse.json(
-        { error: 'Failed to create test session' },
+        { 
+          error: 'Failed to update test session',
+          details: error.message,
+          code: error.code
+        },
         { status: 500 }
       )
     }

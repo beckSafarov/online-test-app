@@ -8,6 +8,8 @@ export async function submitTestResults(
   answers: Answer[],
 ) {
   try {
+    console.log('Submitting results for session:', sessionId, 'with answers:', answers.length)
+    
     const response = await fetch('/api/results', {
       method: 'POST',
       headers: {
@@ -19,11 +21,15 @@ export async function submitTestResults(
       }),
     })
 
+    const responseData = await response.json()
+
     if (!response.ok) {
-      throw new Error('Failed to submit test results')
+      console.error('Failed to submit results:', responseData)
+      throw new Error(responseData.details || responseData.error || 'Failed to submit test results')
     }
 
-    return await response.json()
+    console.log('Results submitted successfully:', responseData)
+    return responseData
   } catch (error) {
     console.error('Error submitting test results:', error)
     throw error
@@ -37,6 +43,8 @@ export async function endTestSession(
   isCompleted: boolean = true
 ) {
   try {
+    console.log('Ending test session:', sessionId, 'testId:', testId, 'didViolate:', didViolate, 'isCompleted:', isCompleted)
+    
     const response = await fetch('/api/test_session', {
       method: 'PUT',
       headers: {
@@ -51,11 +59,15 @@ export async function endTestSession(
       }),
     })
 
+    const responseData = await response.json()
+
     if (!response.ok) {
-      throw new Error('Failed to end test session')
+      console.error('Failed to end test session:', responseData)
+      throw new Error(responseData.details || responseData.error || 'Failed to end test session')
     }
 
-    return await response.json()
+    console.log('Test session ended successfully:', responseData)
+    return responseData
   } catch (error) {
     console.error('Error ending test session:', error)
     throw error

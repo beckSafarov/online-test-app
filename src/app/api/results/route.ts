@@ -38,9 +38,18 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Supabase error:', error)
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
       return NextResponse.json(
-        { error: 'Failed to create test results' },
+        { 
+          error: 'Failed to create test results',
+          details: error.message,
+          code: error.code
+        },
         { status: 500 }
       )
     }
