@@ -2,21 +2,30 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTestStore } from '@/store/testStore'
-import { useEffect, useState } from 'react'
-import { Container, Input, Button, Card, Alert } from '@/components'
+import { useEffect, useState, Suspense } from 'react'
+import {
+  Container,
+  Input,
+  Button,
+  Card,
+  Alert,
+  LoadingSpinner,
+} from '@/components'
 
-export default function UserDetailsPage() {
+function UserDetailsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const testId = searchParams.get('id')
   const { currentTest, setError } = useTestStore()
-  
+
   const [userDetails, setUserDetails] = useState({
     name: '',
-    phoneNumber: ''
+    phoneNumber: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<{name?: string; phoneNumber?: string}>({})
+  const [errors, setErrors] = useState<{ name?: string; phoneNumber?: string }>(
+    {}
+  )
 
   useEffect(() => {
     // If no test ID or no test data, redirect to home
@@ -194,5 +203,19 @@ export default function UserDetailsPage() {
         </div>
       </Container>
     </div>
+  )
+}
+
+export default function UserDetailsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='min-h-screen bg-white flex items-center justify-center'>
+          <LoadingSpinner size='lg' text='Yuklanmoqda...' />
+        </div>
+      }
+    >
+      <UserDetailsContent />
+    </Suspense>
   )
 }

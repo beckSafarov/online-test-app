@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTestStore } from '@/store/testStore'
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { Container, Button, LoadingSpinner } from '@/components'
 import { fetch_test } from '@/utils/api_client'
 import { JSX } from 'react'
@@ -64,7 +64,7 @@ const test_rules_test = [
   },
 ]
 
-export default function TestInstructionsPage() {
+function TestInstructionsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const testId = searchParams.get('id')
@@ -231,5 +231,19 @@ export default function TestInstructionsPage() {
         </div>
       </Container>
     </div>
+  )
+}
+
+export default function TestInstructionsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='min-h-screen bg-white flex items-center justify-center'>
+          <LoadingSpinner size='lg' text='Yuklanmoqda...' />
+        </div>
+      }
+    >
+      <TestInstructionsContent />
+    </Suspense>
   )
 }
