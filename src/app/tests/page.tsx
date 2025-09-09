@@ -8,28 +8,28 @@ import { fetch_test } from '@/utils/api_client'
 
 const test_rules_test = [
   {
-    strong: 'No Cheating:',
-    text: ' Any form of cheating, including using unauthorized resources or collaborating with others, is strictly prohibited and will result in immediate disqualification.',
+    strong: "Ko'chirmachilik qilmang:",
+    text: ' Ruxsatsiz manbalardan foydalanish yoki boshqalar bilan hamkorlik qilish kabi har qanday aldov taqiqlanadi va darhol diskvalifikatsiya qilinadi.',
   },
   {
-    strong: 'No Tab/App Switching:',
-    text: ' Switching to other browser tabs, applications, or leaving the test window will result in automatic test failure.',
+    strong: 'Tab/Ilova almashtirish mumkin emas:',
+    text: ' Boshqa oynalarga o‘tish, ilovalarni almashtirish yoki test oynasidan chiqish testning avtomatik bekor bo‘lishiga olib keladi.',
   },
   {
-    strong: 'Full Screen Mode:',
-    text: ' The test must be taken in full screen mode. Exiting full screen will terminate the test.',
+    strong: 'To‘liq ekran rejimi:',
+    text: 'Test to‘liq ekran rejimida topshirilishi kerak. To‘liq ekrandan chiqish testni yakunlashga sabab bo‘ladi.',
   },
   {
-    strong: 'Time Limit:',
-    text: ' Complete the test within the allocated time. The test will auto-submit when time expires.',
+    strong: 'Vaqt cheklovi:',
+    text: ' Testni ajratilgan vaqt ichida yakunlang. Vaqt tugaganda test avtomatik topshiriladi.',
   },
   {
-    strong: 'Single Attempt.',
-    text: 'You have only one attempt to complete this test. Once started, you cannot restart.',
+    strong: 'Bitta urinish.',
+    text: 'Bu testni yakunlash uchun sizda faqat bitta urinish bor. Boshlanganidan so‘ng qayta boshlash mumkin emas.',
   },
   {
-    strong: 'Technical Requirements.',
-    text: 'Ensure stable internet connection. Technical issues during the test may not allow for retakes.',
+    strong: 'Texnik talablar.',
+    text: 'Doimiy internetga ega bo‘ling. Test davomida yuzaga kelgan texnik muammolar qayta topshirishga ruxsat bermasligi mumkin.',
   },
 ]
 
@@ -43,7 +43,7 @@ export default function TestInstructionsPage() {
     // If no test ID or no test data, redirect to home
     if (testId && !currentTest) handleFetchTest()
     if (!testId && !currentTest) {
-      setError('Please enter a valid test ID.')
+      setError('Iltimos, to‘g‘ri test ID raqamini kiriting.')
       router.push('/')
     }
   }, [testId, currentTest, router, setError])
@@ -56,13 +56,15 @@ export default function TestInstructionsPage() {
         useTestStore.getState().setCurrentTest(res)
       } else {
         setError(
-          'Test not found. Please enter a valid test ID from the home page.'
+          'Test topilmadi. Iltimos, bosh sahifadagi to‘g‘ri test ID ni kiriting.'
         )
         router.push('/')
       }
     } catch (error) {
-      console.error('Error fetching test:', error)
-      setError('Error fetching test. Please try again later.')
+      console.error('Testni olishda xatolik:', error)
+      setError(
+        'Testni olishda xatolik yuz berdi. Keyinroq qayta urinib ko‘ring.'
+      )
       router.push('/')
     } finally {
       setLoading(false)
@@ -83,7 +85,7 @@ export default function TestInstructionsPage() {
   if (!testId || !currentTest || isLoading) {
     return (
       <div className='min-h-screen bg-white flex items-center justify-center'>
-        <LoadingSpinner size='lg' text='Redirecting...' />
+        <LoadingSpinner size='lg' text='Yo‘naltirilmoqda...' />
       </div>
     )
   }
@@ -94,13 +96,13 @@ export default function TestInstructionsPage() {
         {/* Header Section */}
         <div className='mb-8 sm:mb-12 text-center'>
           <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600 mb-2 sm:mb-4'>
-            Test Instructions
+            Test ko‘rsatmalari
           </h1>
           <h2 className='text-lg sm:text-xl lg:text-2xl text-gray-700 mb-2 sm:mb-4'>
-            {currentTest.title || 'Dusel Online Test'}
+            {currentTest.title || 'Dusel Onlayn Test'}
           </h2>
           <p className='text-sm sm:text-base text-gray-600 px-4 sm:px-0'>
-            Please read the following instructions carefully before proceeding.
+            Davom etishdan oldin quyidagi ko‘rsatmalarni diqqat bilan o‘qing.
           </p>
         </div>
 
@@ -122,12 +124,12 @@ export default function TestInstructionsPage() {
             </div>
             <div className='ml-3'>
               <h3 className='text-sm font-medium text-yellow-800'>
-                Important Warning
+                Muhim ogohlantirish
               </h3>
               <div className='mt-2 text-sm text-yellow-700'>
                 <p>
-                  This is a monitored online test. Please ensure you follow all
-                  rules.
+                  Bu kuzatuv ostidagi onlayn test. Iltimos, barcha qoidalarga
+                  rioya qiling.
                 </p>
               </div>
             </div>
@@ -137,7 +139,7 @@ export default function TestInstructionsPage() {
         {/* Rules Section */}
         <div className='bg-white border border-gray-200 rounded-lg shadow-sm p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8'>
           <h3 className='text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6'>
-            Test Rules & Guidelines
+            Test qoidalari va yo‘riqnomalar
           </h3>
 
           {test_rules_test.map(
@@ -160,19 +162,19 @@ export default function TestInstructionsPage() {
         {/* Consequences Section */}
         <div className='bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8'>
           <h3 className='text-lg sm:text-xl font-semibold text-red-800 mb-2 sm:mb-3'>
-            Violation Consequences
+            Qoidabuzarlik oqibatlari
           </h3>
           <p className='text-sm sm:text-base text-red-700 leading-relaxed'>
-            Any violation of the above rules will result in immediate test
-            termination and disqualification. Your test attempt will be marked
-            as failed and no retakes will be allowed.
+            Yuqoridagi qoidalarni buzish testning darhol yakunlanishiga va
+            diskvalifikatsiyaga olib keladi. Urinish muvaffaqiyatsiz deb
+            baholanadi va qayta topshirishga ruxsat berilmaydi.
           </p>
         </div>
 
         {/* Action Buttons */}
         <div className='flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center'>
           <Button variant='secondary' onClick={handleGoBack} fullWidth>
-            Go Back
+            Orqaga qaytish
           </Button>
           <Button
             variant='primary'
@@ -180,15 +182,16 @@ export default function TestInstructionsPage() {
             onClick={handleProceedToTest}
             fullWidth
           >
-            I Understand - Continue
+            Tushundim — Davom etish
           </Button>
         </div>
 
         {/* Disclaimer */}
         <div className='mt-4 sm:mt-6 text-center'>
           <p className='text-xs sm:text-sm text-gray-500 px-4 sm:px-0'>
-            By clicking "Continue", you acknowledge that you have read and agree
-            to follow all test rules.
+            "Davom etish" tugmasini bosish orqali siz barcha test qoidalarini
+            o‘qib chiqqaningiz va ularga rioya qilishga rozilik bildirganingizni
+            tasdiqlaysiz.
           </p>
         </div>
       </Container>

@@ -3,13 +3,15 @@ interface Answer {
   answer: string | string[]
 }
 
-export async function submitTestResults(
-  sessionId: string,
-  answers: Answer[],
-) {
+export async function submitTestResults(sessionId: string, answers: Answer[]) {
   try {
-    console.log('Submitting results for session:', sessionId, 'with answers:', answers.length)
-    
+    console.log(
+      'Sessiya uchun natijalar yuborilmoqda:',
+      sessionId,
+      'javoblar soni:',
+      answers.length
+    )
+
     const response = await fetch('/api/results', {
       method: 'POST',
       headers: {
@@ -24,14 +26,18 @@ export async function submitTestResults(
     const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Failed to submit results:', responseData)
-      throw new Error(responseData.details || responseData.error || 'Failed to submit test results')
+      console.error('Natijalarni yuborib bo‘lmadi:', responseData)
+      throw new Error(
+        responseData.details ||
+          responseData.error ||
+          'Test natijalarini yuborib bo‘lmadi'
+      )
     }
 
-    console.log('Results submitted successfully:', responseData)
+    console.log('Natijalar muvaffaqiyatli yuborildi:', responseData)
     return responseData
   } catch (error) {
-    console.error('Error submitting test results:', error)
+    console.error('Test natijalarini yuborishda xatolik:', error)
     throw error
   }
 }
@@ -43,8 +49,17 @@ export async function endTestSession(
   isCompleted: boolean = true
 ) {
   try {
-    console.log('Ending test session:', sessionId, 'testId:', testId, 'didViolate:', didViolate, 'isCompleted:', isCompleted)
-    
+    console.log(
+      'Test sessiyasi yakunlanmoqda:',
+      sessionId,
+      'testId:',
+      testId,
+      'qoidabuzarlik:',
+      didViolate,
+      'yakunlandi:',
+      isCompleted
+    )
+
     const response = await fetch('/api/test_session', {
       method: 'PUT',
       headers: {
@@ -63,14 +78,18 @@ export async function endTestSession(
     const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Failed to end test session:', responseData)
-      throw new Error(responseData.details || responseData.error || 'Failed to end test session')
+      console.error('Test sessiyasini yakunlab bo‘lmadi:', responseData)
+      throw new Error(
+        responseData.details ||
+          responseData.error ||
+          'Test sessiyasini yakunlab bo‘lmadi'
+      )
     }
 
-    console.log('Test session ended successfully:', responseData)
+    console.log('Test sessiyasi muvaffaqiyatli yakunlandi:', responseData)
     return responseData
   } catch (error) {
-    console.error('Error ending test session:', error)
+    console.error('Test sessiyasini yakunlashda xatolik:', error)
     throw error
   }
 }
@@ -83,13 +102,13 @@ export async function completeTestNormally(
   try {
     // Submit results first
     await submitTestResults(sessionId, answers)
-    
+
     // End session successfully: did_violate=false, is_completed=true
     await endTestSession(sessionId, testId, false, true)
-    
+
     return { success: true }
   } catch (error) {
-    console.error('Error completing test normally:', error)
+    console.error('Testni odatdagi tarzda yakunlashda xatolik:', error)
     throw error
   }
 }
@@ -102,13 +121,13 @@ export async function terminateTestForViolation(
   try {
     // Submit results first
     await submitTestResults(sessionId, answers)
-    
+
     // End session with violation: did_violate=true, is_completed=false
     await endTestSession(sessionId, testId, true, false)
-    
+
     return { success: true }
   } catch (error) {
-    console.error('Error terminating test for violation:', error)
+    console.error('Qoidabuzarlik uchun testni yakunlashda xatolik:', error)
     throw error
   }
 }

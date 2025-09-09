@@ -21,24 +21,24 @@ export default function UserDetailsPage() {
   useEffect(() => {
     // If no test ID or no test data, redirect to home
     if (!testId || !currentTest) {
-      setError('Please enter a valid test ID from the home page.')
+      setError('Iltimos, bosh sahifadan to‘g‘ri test ID ni kiriting.')
       router.push('/')
     }
   }, [testId, currentTest, router, setError])
 
   const validateForm = () => {
-    const newErrors: {name?: string; phoneNumber?: string} = {}
-    
+    const newErrors: { name?: string; phoneNumber?: string } = {}
+
     if (!userDetails.name.trim()) {
-      newErrors.name = 'Name is required'
+      newErrors.name = 'Ism-sharif majburiy'
     }
-    
+
     if (!userDetails.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required'
+      newErrors.phoneNumber = 'Telefon raqami majburiy'
     } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(userDetails.phoneNumber.trim())) {
-      newErrors.phoneNumber = 'Please enter a valid phone number'
+      newErrors.phoneNumber = 'Iltimos, to‘g‘ri telefon raqamini kiriting'
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -47,7 +47,7 @@ export default function UserDetailsPage() {
     if (!validateForm()) return
 
     setIsSubmitting(true)
-    
+
     try {
       const formData = new FormData()
       formData.append('test_id', testId!)
@@ -57,20 +57,20 @@ export default function UserDetailsPage() {
 
       const response = await fetch('/api/test_session', {
         method: 'POST',
-        body: formData
+        body: formData,
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create test session')
+        throw new Error(data.error || 'Test sessiyasini yaratib bo‘lmadi')
       }
 
       // Session created successfully, proceed to test with session ID
       const sessionId = data.id
       router.push(`/tests/${testId}?sessionId=${sessionId}`)
     } catch (error: any) {
-      setError(error.message || 'Failed to start test session')
+      setError(error.message || 'Test sessiyasini boshlash muvaffaqiyatsiz')
     } finally {
       setIsSubmitting(false)
     }
@@ -85,7 +85,7 @@ export default function UserDetailsPage() {
       <div className='min-h-screen bg-white flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Redirecting...</p>
+          <p className='text-gray-600'>Yo‘naltirilmoqda...</p>
         </div>
       </div>
     )
@@ -97,26 +97,34 @@ export default function UserDetailsPage() {
         {/* Header Section */}
         <div className='mb-8 sm:mb-12 text-center'>
           <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600 mb-2 sm:mb-4'>
-            User Information
+            Foydalanuvchi ma’lumotlari
           </h1>
           <h2 className='text-lg sm:text-xl lg:text-2xl text-gray-700 mb-2 sm:mb-4'>
-            {currentTest.title || 'Dusel Online Test'}
+            {currentTest.title || 'Dusel Onlayn Test'}
           </h2>
           <p className='text-sm sm:text-base text-gray-600 px-4 sm:px-0'>
-            Please provide your details to start the test session.
+            Test sessiyasini boshlash uchun ma’lumotlaringizni kiriting.
           </p>
         </div>
 
         {/* Form Section */}
         <Card padding='lg' className='mb-6 sm:mb-8'>
-          <form onSubmit={(e) => { e.preventDefault(); createTestSession(); }} className='space-y-6'>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              createTestSession()
+            }}
+            className='space-y-6'
+          >
             {/* Name Field */}
             <Input
-              label='Full Name'
+              label='To‘liq ism-familiya'
               type='text'
               value={userDetails.name}
-              onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
-              placeholder='Enter your full name'
+              onChange={(e) =>
+                setUserDetails((prev) => ({ ...prev, name: e.target.value }))
+              }
+              placeholder='To‘liq ism-familiyangizni kiriting'
               disabled={isSubmitting}
               required
               error={errors.name}
@@ -124,19 +132,27 @@ export default function UserDetailsPage() {
 
             {/* Phone Number Field */}
             <Input
-              label='Phone Number'
+              label='Telefon raqami'
               type='tel'
               value={userDetails.phoneNumber}
-              onChange={(e) => setUserDetails(prev => ({ ...prev, phoneNumber: e.target.value }))}
-              placeholder='Enter your phone number'
+              onChange={(e) =>
+                setUserDetails((prev) => ({
+                  ...prev,
+                  phoneNumber: e.target.value,
+                }))
+              }
+              placeholder='Telefon raqamingizni kiriting'
               disabled={isSubmitting}
               required
               error={errors.phoneNumber}
             />
 
             {/* Privacy Notice */}
-            <Alert variant='info' title='Privacy Notice'>
-              <p>Your information will be used solely for test session tracking and verification purposes.</p>
+            <Alert variant='info' title='Maxfiylik haqida bildirishnoma'>
+              <p>
+                Ma’lumotlaringiz faqat test sessiyasini kuzatish va tasdiqlash
+                maqsadida ishlatiladi.
+              </p>
             </Alert>
           </form>
         </Card>
@@ -149,7 +165,7 @@ export default function UserDetailsPage() {
             disabled={isSubmitting}
             fullWidth
           >
-            Go Back
+            Orqaga qaytish
           </Button>
           <Button
             variant='primary'
@@ -159,14 +175,17 @@ export default function UserDetailsPage() {
             loading={isSubmitting}
             fullWidth
           >
-            {isSubmitting ? 'Starting Session...' : 'Start Test Session'}
+            {isSubmitting
+              ? 'Sessiya boshlanmoqda...'
+              : 'Test sessiyasini boshlash'}
           </Button>
         </div>
 
         {/* Disclaimer */}
         <div className='mt-4 sm:mt-6 text-center'>
           <p className='text-xs sm:text-sm text-gray-500 px-4 sm:px-0'>
-            By starting the test session, you confirm that the provided information is accurate.
+            Test sessiyasini boshlash orqali siz kiritilgan ma’lumotlar
+            to‘g‘riligini tasdiqlaysiz.
           </p>
         </div>
       </Container>

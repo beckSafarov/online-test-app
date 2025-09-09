@@ -32,82 +32,82 @@ export default function TestResultsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Processing your test results...</p>
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4'></div>
+          <p className='text-gray-600 font-medium'>
+            Test natijalaringiz qayta ishlanmoqda...
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 sm:py-12">
-      <Container size="md">
-        <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center">
+    <div className='min-h-screen bg-gray-50 py-8 sm:py-12'>
+      <Container size='md'>
+        <div className='bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center'>
           {/* Success Icon */}
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6'>
             <svg
-              className="w-8 h-8 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+              className='w-8 h-8 text-green-600'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap='round'
+                strokeLinejoin='round'
                 strokeWidth={2}
-                d="M5 13l4 4L19 7"
+                d='M5 13l4 4L19 7'
               />
             </svg>
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Test Completed Successfully!
+          <h1 className='text-3xl font-bold text-gray-900 mb-4'>
+            Test muvaffaqiyatli yakunlandi!
           </h1>
 
           {/* Message */}
-          <p className="text-gray-600 mb-2">
-            Thank you for completing the test. Your answers have been submitted successfully.
+          <p className='text-gray-600 mb-2'>
+            Testni yakunlaganingiz uchun rahmat. Javoblaringiz muvaffaqiyatli
+            topshirildi.
           </p>
-          
+
           {sessionId && (
-            <p className="text-sm text-gray-500 mb-8">
-              Session ID: <span className="font-mono">{sessionId}</span>
+            <p className='text-sm text-gray-500 mb-8'>
+              Sessiya ID: <span className='font-mono'>{sessionId}</span>
             </p>
           )}
 
           {/* Additional Info */}
-          <div className="bg-blue-50 rounded-lg p-4 mb-8">
-            <p className="text-blue-800 text-sm">
-              Your test results have been recorded and will be reviewed. 
-              You will be contacted if further action is needed.
+          <div className='bg-blue-50 rounded-lg p-4 mb-8'>
+            <p className='text-blue-800 text-sm'>
+              Test natijalaringiz qayd etildi va ko‘rib chiqiladi. Qo‘shimcha
+              choralar zarur bo‘lsa, siz bilan bog‘lanamiz.
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-sm mx-auto">
-            <Button
-              onClick={handleGoHome}
-              variant="primary"
-              className="flex-1"
-            >
-              Go to Home
+          <div className='flex flex-col sm:flex-row gap-4 justify-center max-w-sm mx-auto'>
+            <Button onClick={handleGoHome} variant='primary' className='flex-1'>
+              Bosh sahifaga o‘tish
             </Button>
             <Button
               onClick={handleTakeAnotherTest}
-              variant="secondary"
-              className="flex-1"
+              variant='secondary'
+              className='flex-1'
             >
-              Take Another Test
+              Yana bir test topshirish
             </Button>
           </div>
 
           {/* Contact Info */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500">
-              If you have any questions about your test submission, please contact support.
+          <div className='mt-8 pt-6 border-t border-gray-200'>
+            <p className='text-xs text-gray-500'>
+              Test topshirish bilan bog‘liq savollaringiz bo‘lsa,
+              qo‘llab-quvvatlash xizmatiga murojaat qiling.
             </p>
           </div>
         </div>

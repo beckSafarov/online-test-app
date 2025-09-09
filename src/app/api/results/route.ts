@@ -8,21 +8,21 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
+
     const { answers, session_id } = body
 
-    // Validate required fields
+    // Majburiy maydonlarni tekshiring
     if (!answers) {
       return NextResponse.json(
-        { error: 'Missing required fields: answers' },
+        { error: 'Majburiy maydon yetishmaydi: answers' },
         { status: 400 }
       )
     }
 
-    // Validate session_id
+    // session_id ni tekshirish
     if (!session_id) {
       return NextResponse.json(
-        { error: 'Missing required fields: session_id' },
+        { error: 'Majburiy maydon yetishmaydi: session_id' },
         { status: 400 }
       )
     }
@@ -32,23 +32,23 @@ export async function POST(request: NextRequest) {
       .from('test_results')
       .insert({
         answers: answers,
-        session_id: session_id
+        session_id: session_id,
       })
       .select()
       .single()
 
     if (error) {
-      console.error('Supabase error details:', {
+      console.error('Supabase xatosi tafsilotlari:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       })
       return NextResponse.json(
-        { 
-          error: 'Failed to create test results',
+        {
+          error: 'Test natijalarini yaratib bo‘lmadi',
           details: error.message,
-          code: error.code
+          code: error.code,
         },
         { status: 500 }
       )
@@ -56,10 +56,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('API xatosi:', error)
+    return NextResponse.json({ error: 'Ichki server xatosi' }, { status: 500 })
   }
 }

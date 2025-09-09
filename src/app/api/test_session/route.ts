@@ -14,12 +14,12 @@ export async function POST(request: NextRequest) {
     const candidatePhone = formData.get('candidate_phone') as string
     const startedAt = formData.get('started_at') as string
 
-    // Validate required fields
+    // Majburiy maydonlarni tekshirish
     if (!testId || !candidateName || !candidatePhone || !startedAt) {
       return NextResponse.json(
         {
           error:
-            'Missing required fields: test_id, candidate_name, candidate_phone, started_at',
+            'Majburiy maydonlar yetishmaydi: test_id, candidate_name, candidate_phone, started_at',
         },
         { status: 400 }
       )
@@ -38,17 +38,17 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Supabase error details:', {
+      console.error('Supabase xatosi tafsilotlari:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       })
       return NextResponse.json(
-        { 
-          error: 'Failed to create test session',
+        {
+          error: 'Test sessiyasini yaratib bo‘lmadi',
           details: error.message,
-          code: error.code
+          code: error.code,
         },
         { status: 500 }
       )
@@ -56,11 +56,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('API xatosi:', error)
+    return NextResponse.json({ error: 'Ichki server xatosi' }, { status: 500 })
   }
 }
 
@@ -77,10 +74,13 @@ export async function PUT(request: NextRequest) {
       is_open,
     } = body
 
-    // Validate required fields
+    // Majburiy maydonlarni tekshirish
     if (!submitted_at || !sessionId || !test_id) {
       return NextResponse.json(
-        { error: 'Missing required fields: submitted_at, sessionId, test_id' },
+        {
+          error:
+            'Majburiy maydonlar yetishmaydi: submitted_at, sessionId, test_id',
+        },
         { status: 400 }
       )
     }
@@ -100,17 +100,17 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Supabase error details:', {
+      console.error('Supabase xatosi tafsilotlari:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       })
       return NextResponse.json(
-        { 
-          error: 'Failed to update test session',
+        {
+          error: 'Test sessiyasini yangilab bo‘lmadi',
           details: error.message,
-          code: error.code
+          code: error.code,
         },
         { status: 500 }
       )
@@ -118,10 +118,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('API xatosi:', error)
+    return NextResponse.json({ error: 'Ichki server xatosi' }, { status: 500 })
   }
 }

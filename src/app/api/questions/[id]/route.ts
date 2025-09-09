@@ -14,7 +14,7 @@ export async function GET(
 
     if (!id) {
       return NextResponse.json(
-        { error: 'ID parameter is required' },
+        { error: 'ID parametri talab qilinadi' },
         { status: 400 }
       )
     }
@@ -27,35 +27,29 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Supabase error details:', {
+      console.error('Supabase xatosi tafsilotlari:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       })
       return NextResponse.json(
-        { 
-          error: 'Failed to fetch test data',
+        {
+          error: 'Test ma’lumotlarini olish muvaffaqiyatsiz',
           details: error.message,
-          code: error.code
+          code: error.code,
         },
         { status: 500 }
       )
     }
 
     if (!data) {
-      return NextResponse.json(
-        { error: 'Test not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Test topilmadi' }, { status: 404 })
     }
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('API xatosi:', error)
+    return NextResponse.json({ error: 'Ichki server xatosi' }, { status: 500 })
   }
 }

@@ -57,7 +57,7 @@ export default function TestPage() {
         setIsFullscreen(true)
       }
     } catch (error) {
-      console.warn('Fullscreen request failed:', error)
+      console.warn('To‘liq ekran so‘rovi bajarilmadi:', error)
     }
   }, [])
 
@@ -68,7 +68,7 @@ export default function TestPage() {
         setIsFullscreen(false)
       }
     } catch (error) {
-      console.warn('Fullscreen exit failed:', error)
+      console.warn('To‘liq ekrandan chiqish muvaffaqiyatsiz:', error)
     }
   }, [])
 
@@ -131,7 +131,7 @@ export default function TestPage() {
       // Show warning if user manually exited fullscreen
       if (wasFullscreen && !nowFullscreen && currentTest) {
         const shouldReturn = confirm(
-          'You have exited fullscreen mode. For the best test experience, it is recommended to stay in fullscreen mode. Would you like to return to fullscreen?'
+          'Siz to‘liq ekran rejimidan chiqdingiz. Eng yaxshi tajriba uchun to‘liq ekranda qolish tavsiya etiladi. To‘liq ekranga qaytishni xohlaysizmi?'
         )
         if (shouldReturn) {
           enterFullscreen()
@@ -175,7 +175,7 @@ export default function TestPage() {
         setTimeout(() => {
           if (!document.fullscreenElement) {
             const shouldReturn = confirm(
-              'You pressed Escape and exited fullscreen mode. Would you like to return to fullscreen for the best test experience?'
+              'Siz Escape tugmasini bosib to‘liq ekran rejimidan chiqdingiz. Eng yaxshi tajriba uchun to‘liq ekranga qaytishni xohlaysizmi?'
             )
             if (shouldReturn) {
               enterFullscreen()
@@ -204,7 +204,7 @@ export default function TestPage() {
   useEffect(() => {
     // Validate session ID - redirect if missing
     if (!sessionId) {
-      setError('Invalid session. Please start the test again.')
+      setError('Noto‘g‘ri sessiya. Iltimos, testni qaytadan boshlang.')
       router.push('/')
       return
     }
@@ -240,7 +240,9 @@ export default function TestPage() {
     const { success, isOpen, error } = await checkSessionStatus(sessionId || '')
     if (!success) {
       console.error(error)
-      setError('Problem with fetching the session data. Please try again')
+      setError(
+        'Sessiya ma’lumotlarini olishda muammo. Iltimos, qayta urinib ko‘ring'
+      )
       setLoading(false)
       return
     }
@@ -260,7 +262,7 @@ export default function TestPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch test')
+        throw new Error(data.error || 'Testni olish muvaffaqiyatsiz')
       }
 
       setCurrentTest(data)
@@ -280,7 +282,7 @@ export default function TestPage() {
         setAnswers(initialAnswers)
       }
     } catch (error: any) {
-      setError(error.message || 'Test not found')
+      setError(error.message || 'Test topilmadi')
       setTimeout(() => {
         router.push('/')
       }, 3000)
@@ -289,7 +291,7 @@ export default function TestPage() {
 
   const handleSubmit = async () => {
     if (!sessionId || !testId) {
-      console.error('Missing sessionId or testId for submission')
+      console.error('Topshirish uchun sessionId yoki testId yetishmayapti')
       return
     }
 
@@ -300,26 +302,34 @@ export default function TestPage() {
         answer: answer.answer,
       }))
 
-      console.log('Submitting test with answers:', formattedAnswers)
+      console.log('Javoblar bilan test topshirilmoqda:', formattedAnswers)
       await completeTestNormally(testId, sessionId, formattedAnswers)
-      console.log('Test submission completed successfully')
+      console.log('Test muvaffaqiyatli topshirildi')
 
       // Navigate to results page immediately after successful submission
       router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
     } catch (error) {
-      console.error('Error submitting test:', error)
+      console.error('Testni topshirishda xatolik:', error)
 
       // Show a more specific error message to the user
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error occurred'
+        error instanceof Error ? error.message : 'Noma’lum xatolik yuz berdi'
 
-      if (errorMessage.includes('Failed to fetch test data')) {
+      if (
+        errorMessage.includes('Failed to fetch test data') ||
+        errorMessage.includes('Test ma’lumotlarini olish muvaffaqiyatsiz')
+      ) {
         // This is likely a submission success but API fetch issue after submission
-        console.log('Submission likely succeeded, redirecting to results...')
+        console.log(
+          'Ehtimol, topshirish muvaffaqiyatli. Natijalarga yo‘naltirilmoqda...'
+        )
         router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
       } else {
         // For other errors, still redirect but log the issue
-        console.error('Submission error, but redirecting anyway:', errorMessage)
+        console.error(
+          'Topshirishda xatolik, lekin baribir yo‘naltirilmoqda:',
+          errorMessage
+        )
         router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
       }
     }
@@ -354,7 +364,7 @@ export default function TestPage() {
   const handleReset = () => {
     if (
       confirm(
-        'Are you sure you want to reset all your answers? This action cannot be undone.'
+        'Barcha javoblaringizni qayta tiklashni xohlaysizmi? Bu amalni orqaga qaytarib bo‘lmaydi.'
       )
     ) {
       if (currentTest?.questions) {
@@ -387,7 +397,7 @@ export default function TestPage() {
       <div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4'></div>
-          <p className='text-gray-600 font-medium'>Loading test...</p>
+          <p className='text-gray-600 font-medium'>Test yuklanmoqda...</p>
         </div>
       </div>
     )
@@ -399,19 +409,19 @@ export default function TestPage() {
         <Container size='lg'>
           <div className='text-center bg-white rounded-xl shadow-sm p-8 border border-gray-100'>
             <h1 className='text-2xl font-bold text-red-600 mb-4'>
-              Test Not Found
+              Test topilmadi
             </h1>
             <p className='text-gray-600 mb-4'>
-              {error || 'The requested test could not be found.'}
+              {error || 'So‘ralgan test topilmadi.'}
             </p>
             <p className='text-sm text-gray-500 mb-6'>
-              Redirecting to home page...
+              Bosh sahifaga yo‘naltirilmoqda...
             </p>
             <button
               onClick={() => router.push('/')}
               className='px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium'
             >
-              Go Home Now
+              Darhol bosh sahifaga o‘tish
             </button>
           </div>
         </Container>
@@ -436,12 +446,16 @@ export default function TestPage() {
                 className='text-red-600 hover:text-red-700 flex items-center gap-2 text-sm font-medium transition-colors'
               >
                 <BackArrowIcon className='w-4 h-4' />
-                Back to Home
+                Bosh sahifaga qaytish
               </button>
               <button
                 onClick={isFullscreen ? exitFullscreen : enterFullscreen}
                 className='text-blue-600 hover:text-blue-700 flex items-center gap-2 text-sm font-medium transition-colors p-2 rounded-lg hover:bg-blue-50'
-                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+                title={
+                  isFullscreen
+                    ? 'To‘liq ekrandan chiqish'
+                    : 'To‘liq ekranga o‘tish'
+                }
               >
                 {isFullscreen ? (
                   <ExitFullscreenIcon className='w-4 h-4' />
@@ -449,14 +463,14 @@ export default function TestPage() {
                   <FullscreenIcon className='w-4 h-4' />
                 )}
                 <span className='hidden sm:inline'>
-                  {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+                  {isFullscreen ? 'To‘liq ekrandan chiqish' : 'To‘liq ekran'}
                 </span>
               </button>
             </div>
             {timeRemaining !== null && (
               <div className='flex items-center gap-3'>
                 <span className='text-sm text-gray-600 font-medium'>
-                  Time Remaining:
+                  Qolgan vaqt:
                 </span>
                 <span
                   className={`text-lg font-mono font-bold px-4 py-2 rounded-lg border ${
@@ -469,7 +483,7 @@ export default function TestPage() {
                 </span>
                 {isFullscreen && (
                   <span className='text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-200 font-medium'>
-                    📺 Fullscreen
+                    📺 To‘liq ekran
                   </span>
                 )}
               </div>
@@ -478,7 +492,7 @@ export default function TestPage() {
 
           <div className='text-center mb-8'>
             <h1 className='text-3xl sm:text-4xl font-bold text-red-600 mb-6'>
-              {currentTest.title || 'Dusel Online Test'}
+              {currentTest.title || 'Dusel Onlayn Test'}
             </h1>
             {currentTest.description && (
               <p className='text-gray-700 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8'>
@@ -490,7 +504,7 @@ export default function TestPage() {
           <div className='flex flex-col sm:flex-row gap-4 items-center justify-center text-sm text-gray-600 bg-gray-50 rounded-lg p-6'>
             {currentTest.questions && (
               <div className='flex items-center justify-between'>
-                <div className='font-medium text-gray-700'>❓ Questions:</div>
+                <div className='font-medium text-gray-700'>❓ Savollar:</div>
                 <div className='font-bold text-gray-800 bg-green-100 px-3 py-1 rounded-full'>
                   {currentTest.questions.length}
                 </div>
@@ -498,9 +512,11 @@ export default function TestPage() {
             )}
             {currentTest.duration_minutes && (
               <div className='flex items-center justify-between'>
-                <span className='font-medium text-gray-700'>⌛️ Duration:</span>
+                <span className='font-medium text-gray-700'>
+                  ⌛️ Davomiylik:
+                </span>
                 <span className='font-bold text-gray-800 bg-green-100 px-3 py-1 rounded-full'>
-                  {currentTest.duration_minutes} minutes
+                  {currentTest.duration_minutes} daqiqa
                 </span>
               </div>
             )}
@@ -509,9 +525,9 @@ export default function TestPage() {
           {!isFullscreen && (
             <div className='mt-4 text-center'>
               <p className='text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded-lg p-3 max-w-lg mx-auto'>
-                💡 <strong>Tip:</strong> This test automatically opens in
-                fullscreen mode for the best experience. Press F11 or use the
-                fullscreen button to toggle.
+                💡 <strong>Maslahat:</strong> Eng yaxshi tajriba uchun test
+                avtomatik ravishda to‘liq ekran rejimida ochiladi. F11 ni bosing
+                yoki to‘liq ekran tugmasidan foydalaning.
               </p>
             </div>
           )}
@@ -539,11 +555,13 @@ export default function TestPage() {
         ) : isLoading ? (
           <div className='bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center'>
             <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4'></div>
-            <p className='text-gray-600 font-medium'>Preparing questions...</p>
+            <p className='text-gray-600 font-medium'>
+              Savollar tayyorlanmoqda...
+            </p>
           </div>
         ) : (
           <div className='bg-white rounded-xl shadow-sm p-8 border border-gray-100 text-center'>
-            <p className='text-gray-600'>No questions available.</p>
+            <p className='text-gray-600'>Savollar mavjud emas.</p>
           </div>
         )}
 
@@ -555,20 +573,20 @@ export default function TestPage() {
                 onClick={handleReset}
                 className='px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200'
               >
-                Reset All
+                Barchasini tiklash
               </button>
               <button
                 onClick={handleSubmit}
                 className='px-8 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 shadow-md hover:shadow-lg'
               >
-                Submit Test
+                Testni topshirish
               </button>
             </div>
 
             <div className='mt-6 text-center'>
               <p className='text-sm text-gray-600 leading-relaxed max-w-xl mx-auto'>
-                Make sure to review all your answers before submitting. You
-                cannot change them after submission.
+                Topshirishdan oldin barcha javoblaringizni ko‘rib chiqing.
+                Topshirilgandan keyin ularni o‘zgartirib bo‘lmaydi.
               </p>
             </div>
           </div>

@@ -1,16 +1,16 @@
 export const fetch_test = async (id: string | null) => {
-  if (!id) throw new Error('Test ID is required')
+  if (!id) throw new Error('Test ID talab qilinadi')
   try {
     const response = await fetch(`/api/questions/${id}`)
     const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to fetch test')
+      throw new Error(data.error || 'Testni olish muvaffaqiyatsiz')
     }
 
     return data
   } catch (error) {
-    console.error('Error fetching test:', error)
+    console.error('Testni olishda xatolik:', error)
     throw error
   }
 }
@@ -50,7 +50,7 @@ export const checkSessionStatus = async (sessionId: string): Promise<{
     return {
       success: false,
       isOpen: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Noma’lum xatolik',
     }
   }
 }

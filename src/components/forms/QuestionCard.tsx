@@ -26,7 +26,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           </h3>
           {question.points && (
             <span className='inline-block bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1 rounded-full'>
-              {question.points} points
+              {question.points} ball
             </span>
           )}
         </div>
@@ -100,7 +100,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             <textarea
               value={typeof currentAnswer === 'string' ? currentAnswer : ''}
               onChange={(e) => onAnswerChange(question.id, e.target.value)}
-              placeholder='Enter your answer here...'
+              placeholder='Javobingizni bu yerga yozing...'
               maxLength={question.max_length}
               className='w-full p-4 bg-gray-50 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:bg-white resize-none text-gray-800 transition-all duration-200'
               rows={6}
@@ -108,7 +108,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             {question.max_length && (
               <div className='mt-3 text-sm text-gray-500 text-right font-medium'>
                 {typeof currentAnswer === 'string' ? currentAnswer.length : 0} /{' '}
-                {question.max_length} characters
+                {question.max_length} ta belgi
               </div>
             )}
           </div>

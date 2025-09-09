@@ -27,7 +27,8 @@ export default function Home() {
       router.push(`/tests?id=${cleanTestId}`)
     } catch (error: any) {
       setError(
-        error.message || 'Test not found. Please check the ID and try again.'
+        error.message ||
+          'Test topilmadi. Iltimos, ID raqamini tekshirib qayta urinib ko‘ring.'
       )
     }
   }
@@ -37,11 +38,11 @@ export default function Home() {
       <Container size='sm'>
         <div className='text-center'>
           <h1 className='text-3xl sm:text-4xl font-bold text-red-600 mb-4'>
-            Dusel Online Test
+            Dusel Onlayn Test
           </h1>
 
           <p className='text-gray-600 mb-8 text-base sm:text-lg'>
-            Enter the test ID and take the test
+            Test ID raqamini kiriting va testni boshlang
           </p>
 
           <form onSubmit={handleSubmit} className='space-y-6'>
@@ -50,7 +51,7 @@ export default function Home() {
                 type='text'
                 value={testId}
                 onChange={(e) => setTestId(e.target.value)}
-                placeholder='Enter test UUID'
+                placeholder='Test UUID ni kiriting'
                 required
                 disabled={isLoading}
                 className='flex-1 border-2 border-red-200 focus:border-red-500 focus:ring-red-200'
@@ -61,7 +62,7 @@ export default function Home() {
                 loading={isLoading}
                 className='whitespace-nowrap'
               >
-                {isLoading ? 'Loading...' : 'Send'}
+                {isLoading ? 'Yuklanmoqda...' : 'Yuborish'}
               </Button>
             </div>
 

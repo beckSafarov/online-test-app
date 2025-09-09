@@ -13,17 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Dusel Online Test',
-  description: 'Enter the test ID and take the test',
+  title: 'Dusel Onlayn Test',
+  description: 'Test ID raqamini kiriting va testni boshlang',
 }
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang='en'>
+    <html lang='uz'>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
