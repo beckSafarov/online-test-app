@@ -17,28 +17,48 @@ export class TestMonitor {
     isActive: true,
     violations: 0,
     leftAt: null,
-    totalAwayTime: 0
+    totalAwayTime: 0,
   }
 
   private timeoutId: NodeJS.Timeout | null = null
   private terminationTimeoutId: NodeJS.Timeout | null = null
   private callbacks: TestMonitorCallbacks
+  private isMobile: boolean
 
   constructor(callbacks: TestMonitorCallbacks) {
     this.callbacks = callbacks
+    this.isMobile = this.detectMobile()
+  }
+
+  private detectMobile(): boolean {
+    return (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) ||
+      window.innerWidth <= 768 ||
+      'ontouchstart' in window
+    )
   }
 
   init() {
     this.setupVisibilityListener()
-    this.setupFocusListeners()
+    if (!this.isMobile) {
+      this.setupFocusListeners()
+    }
+    this.setupPageHideListener()
   }
 
   destroy() {
     this.clearTimeout()
     this.clearTerminationTimeout()
-    document.removeEventListener('visibilitychange', this.handleVisibilityChange)
+    document.removeEventListener(
+      'visibilitychange',
+      this.handleVisibilityChange
+    )
     window.removeEventListener('focus', this.handleFocus)
     window.removeEventListener('blur', this.handleBlur)
+    window.removeEventListener('pagehide', this.handlePageHide)
+    window.removeEventListener('beforeunload', this.handleBeforeUnload)
   }
 
   private setupVisibilityListener() {
@@ -50,41 +70,73 @@ export class TestMonitor {
     window.addEventListener('blur', this.handleBlur)
   }
 
+  private setupPageHideListener() {
+    // These events are more reliable on mobile
+    window.addEventListener('pagehide', this.handlePageHide)
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
+  }
+
   private handleVisibilityChange = () => {
     const isVisible = !document.hidden
+    const wasVisible = this.state.isVisible
+
+    console.log(`📱 Visibility changed: ${wasVisible} -> ${isVisible}`)
+
     this.updateState({ isVisible })
-    
-    // Only handle visibility changes, not focus changes
-    // This prevents double-counting when both visibility and focus change
-    if (!isVisible && this.state.isActive) {
+
+    if (!isVisible && wasVisible && !this.state.leftAt) {
+      console.log('🚨 Page became hidden - user left')
       this.handleUserLeft()
-    } else if (isVisible && !this.state.leftAt) {
+    } else if (isVisible && !wasVisible && this.state.leftAt) {
+      console.log('👋 Page became visible - user returned')
       this.handleUserReturned()
     }
   }
 
   private handleFocus = () => {
+    console.log('🎯 Window focused')
     this.updateState({ isActive: true })
-    // Only handle pure focus changes when page is visible
-    if (this.state.isVisible && this.state.leftAt) {
+
+    // Only handle if we're tracking a departure and page is visible
+    if (this.state.leftAt && this.state.isVisible) {
       this.handleUserReturned()
     }
   }
 
   private handleBlur = () => {
+    console.log('💨 Window blurred')
     this.updateState({ isActive: false })
-    // Only handle pure blur when page is visible
-    if (this.state.isVisible && !this.state.leftAt) {
+
+    // On mobile, blur might not mean they left the test
+    if (!this.isMobile && this.state.isVisible && !this.state.leftAt) {
+      this.handleUserLeft()
+    }
+  }
+
+  private handlePageHide = () => {
+    console.log('📱 Page hide event (mobile app switch)')
+    if (!this.state.leftAt) {
+      this.handleUserLeft()
+    }
+  }
+
+  private handleBeforeUnload = () => {
+    console.log('📱 Before unload event')
+    if (!this.state.leftAt) {
       this.handleUserLeft()
     }
   }
 
   private handleUserLeft() {
-    if (this.state.leftAt) return // Already tracking
+    if (this.state.leftAt) {
+      console.log('⚠️ Already tracking user departure')
+      return
+    }
 
-    console.log('🚨 User left the test window')
-    this.updateState({ leftAt: Date.now() })
-    
+    const timestamp = Date.now()
+    console.log(`🚨 User left at ${timestamp}`)
+    this.updateState({ leftAt: timestamp })
+
     // Set 5-second timeout for auto-termination
     this.timeoutId = setTimeout(() => {
       console.log('⏰ 5-second timeout reached - terminating test')
@@ -93,50 +145,62 @@ export class TestMonitor {
   }
 
   private handleUserReturned() {
-    if (!this.state.leftAt) return // Wasn't tracking
+    if (!this.state.leftAt) {
+      console.log('⚠️ Not tracking any departure')
+      return
+    }
 
-    const awayTime = Date.now() - this.state.leftAt
+    const returnTime = Date.now()
+    const awayTime = returnTime - this.state.leftAt
     const totalAwayTime = this.state.totalAwayTime + awayTime
 
-    console.log(`👋 User returned after ${awayTime}ms`)
+    console.log(
+      `👋 User returned after ${awayTime}ms (total away: ${totalAwayTime}ms)`
+    )
 
     this.clearTimeout()
-    
+
     // If away for less than 5 seconds, count as violation
     if (awayTime < 5000) {
       const violations = this.state.violations + 1
-      
+
       console.log(`⚠️ Violation #${violations} (away for ${awayTime}ms)`)
-      
+
       this.updateState({
         violations,
         leftAt: null,
-        totalAwayTime
+        totalAwayTime,
       })
 
       // Always show violation warning first
-      console.log(`� Showing violation warning (${violations}/3)`)
+      console.log(`🚨 Showing violation warning (${violations}/3)`)
       this.callbacks.onViolation(violations)
 
-      // Check for termination AFTER showing warning, with a delay
+      // Check for termination AFTER showing warning
       if (violations >= 3) {
-        console.log('💀 3 violations reached - will terminate after warning is acknowledged')
-        // Give user time to see and acknowledge the final warning (5 seconds)
+        console.log('💀 3 violations reached - will terminate after warning')
+        // Give user time to see the warning
         this.terminationTimeoutId = setTimeout(() => {
           this.terminateTest('violations')
-        }, 5000)
+        }, 3000) // Reduced from 5 seconds to 3 for faster response
       }
     } else {
       // Was away for 5+ seconds, should have been terminated
-      console.log(`⏰ Was away for ${awayTime}ms (5+ seconds) - should have been terminated`)
+      console.log(
+        `⏰ Was away for ${awayTime}ms (5+ seconds) - should have been terminated`
+      )
       this.updateState({
         leftAt: null,
-        totalAwayTime
+        totalAwayTime,
       })
+
+      // If somehow they returned after 5+ seconds without being terminated, terminate now
+      this.terminateTest('timeout')
     }
   }
 
   private terminateTest(reason: 'timeout' | 'violations') {
+    console.log(`💀 Terminating test due to: ${reason}`)
     this.clearTimeout()
     this.clearTerminationTimeout()
     this.callbacks.onTestTerminated(reason)
@@ -144,6 +208,7 @@ export class TestMonitor {
 
   private updateState(updates: Partial<TestMonitorState>) {
     this.state = { ...this.state, ...updates }
+    console.log('📊 State updated:', this.state)
   }
 
   private clearTimeout() {
@@ -167,7 +232,9 @@ export class TestMonitor {
   // Method to immediately terminate test after final warning acknowledgment
   terminateAfterFinalWarning() {
     if (this.state.violations >= 3) {
-      console.log('💀 Final warning acknowledged - terminating test immediately')
+      console.log(
+        '💀 Final warning acknowledged - terminating test immediately'
+      )
       this.terminateTest('violations')
     }
   }
