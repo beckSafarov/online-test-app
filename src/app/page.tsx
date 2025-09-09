@@ -25,6 +25,7 @@ export default function Home() {
       const testData = await fetch_test(cleanTestId)
       setCurrentTest(testData)
       router.push(`/tests?id=${cleanTestId}`)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setError(
         error.message ||

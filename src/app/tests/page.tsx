@@ -8,7 +8,7 @@ import { fetch_test } from '@/utils/api_client'
 
 const test_rules_test = [
   {
-    strong: "Ko'chirmachilik qilmang:",
+    strong: '&#34;Ko&#39;chirmachilik qilmang:&#34;',
     text: ' Ruxsatsiz manbalardan foydalanish yoki boshqalar bilan hamkorlik qilish kabi har qanday aldov taqiqlanadi va darhol diskvalifikatsiya qilinadi.',
   },
   {
@@ -189,9 +189,9 @@ export default function TestInstructionsPage() {
         {/* Disclaimer */}
         <div className='mt-4 sm:mt-6 text-center'>
           <p className='text-xs sm:text-sm text-gray-500 px-4 sm:px-0'>
-            "Davom etish" tugmasini bosish orqali siz barcha test qoidalarini
-            o‘qib chiqqaningiz va ularga rioya qilishga rozilik bildirganingizni
-            tasdiqlaysiz.
+            &#34;Davom etish&#34; tugmasini bosish orqali siz barcha test
+            qoidalarini o‘qib chiqqaningiz va ularga rioya qilishga rozilik
+            bildirganingizni tasdiqlaysiz.
           </p>
         </div>
       </Container>

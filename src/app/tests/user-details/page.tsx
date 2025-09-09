@@ -69,6 +69,7 @@ export default function UserDetailsPage() {
       // Session created successfully, proceed to test with session ID
       const sessionId = data.id
       router.push(`/tests/${testId}?sessionId=${sessionId}`)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setError(error.message || 'Test sessiyasini boshlash muvaffaqiyatsiz')
     } finally {

@@ -20,6 +20,12 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    "type": "command",
+    "details": {
+      "key": "editor.action.quickFix"
+    }
+  }
 ];
 
 export default eslintConfig;
