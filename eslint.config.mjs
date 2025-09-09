@@ -19,12 +19,6 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
-  },
-  {
-    "type": "command",
-    "details": {
-      "key": "editor.action.quickFix"
-    }
   }
 ];
 
