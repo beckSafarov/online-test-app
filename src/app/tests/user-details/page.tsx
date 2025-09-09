@@ -56,8 +56,9 @@ export default function UserDetailsPage() {
         },
         body: JSON.stringify({
           testId: testId,
-          userName: userDetails.name,
-          phoneNumber: userDetails.phoneNumber,
+          candidateName: userDetails.name,
+          candidatePhone: userDetails.phoneNumber,
+          startedAt: new Date(),
         }),
       })
 
@@ -68,7 +69,7 @@ export default function UserDetailsPage() {
       }
 
       // On success, navigate to the test with session ID
-      router.push(`/tests/${testId}?sessionId=${data.sessionId}`)
+      router.push(`/tests/${testId}?sessionId=${data.id}`)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

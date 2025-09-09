@@ -240,7 +240,7 @@ export default function TestPage() {
     if (!success) {
       console.error(error)
       setError(
-        'Sessiya ma’lumotlarini olishda muammo. Iltimos, qayta urinib koring'
+        'Sessiya malumotlarini olishda muammo. Iltimos, qayta urinib koring'
       )
       setLoading(false)
       return

@@ -7,12 +7,9 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
+    const body = await request.json()
 
-    const testId = formData.get('test_id') as string
-    const candidateName = formData.get('candidate_name') as string
-    const candidatePhone = formData.get('candidate_phone') as string
-    const startedAt = formData.get('started_at') as string
+    const { testId, candidateName, candidatePhone, startedAt } = body
 
     // Majburiy maydonlarni tekshirish
     if (!testId || !candidateName || !candidatePhone || !startedAt) {

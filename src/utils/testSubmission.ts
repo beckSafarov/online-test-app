@@ -26,11 +26,11 @@ export async function submitTestResults(sessionId: string, answers: Answer[]) {
     const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('Natijalarni yuborib bo‘lmadi:', responseData)
+      console.error('Natijalarni yuborib bolmadi:', responseData)
       throw new Error(
         responseData.details ||
           responseData.error ||
-          'Test natijalarini yuborib bo‘lmadi'
+          'Test natijalarini yuborib bolmadi'
       )
     }
 

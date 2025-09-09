@@ -1,16 +1,13 @@
 'use client'
 
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Container } from '@/components'
 import Button from '@/components/ui/Button'
 
 export default function TestResultsPage() {
-  const searchParams = useSearchParams()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
-
-  const sessionId = searchParams.get('sessionId')
 
   useEffect(() => {
     // Simulate loading time to show the completion message
@@ -21,9 +18,7 @@ export default function TestResultsPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleGoHome = () => {
-    router.push('/')
-  }
+  const handleGoHome = () => router.push('/')
 
   if (isLoading) {
     return (
@@ -69,12 +64,6 @@ export default function TestResultsPage() {
             Testni yakunlaganingiz uchun rahmat. Javoblaringiz muvaffaqiyatli
             topshirildi.
           </p>
-
-          {sessionId && (
-            <p className='text-sm text-gray-500 mb-8'>
-              Sessiya ID: <span className='font-mono'>{sessionId}</span>
-            </p>
-          )}
 
           {/* Additional Info */}
           <div className='bg-blue-50 rounded-lg p-4 mb-8'>
