@@ -9,8 +9,7 @@ export default function TestResultsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
-  
-  const testId = searchParams.get('testId')
+
   const sessionId = searchParams.get('sessionId')
 
   useEffect(() => {
@@ -26,17 +25,13 @@ export default function TestResultsPage() {
     router.push('/')
   }
 
-  const handleTakeAnotherTest = () => {
-    router.push('/tests')
-  }
-
   if (isLoading) {
     return (
       <div className='min-h-screen bg-gray-50 flex items-center justify-center p-4'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4'></div>
           <p className='text-gray-600 font-medium'>
-            Test natijalaringiz qayta ishlanmoqda...
+            Test natijalaringiz o&apos;rganilmoqda...
           </p>
         </div>
       </div>
@@ -84,30 +79,24 @@ export default function TestResultsPage() {
           {/* Additional Info */}
           <div className='bg-blue-50 rounded-lg p-4 mb-8'>
             <p className='text-blue-800 text-sm'>
-              Test natijalaringiz qayd etildi va ko‘rib chiqiladi. Qo‘shimcha
-              choralar zarur bo‘lsa, siz bilan bog‘lanamiz.
+              Test natijalaringiz qayd etildi va ko&apos;rib chiqiladi.
+              Qo&apos;shimcha choralar zarur bo&apos;lsa, siz bilan
+              bog&apos;lanamiz.
             </p>
           </div>
 
           {/* Action Buttons */}
           <div className='flex flex-col sm:flex-row gap-4 justify-center max-w-sm mx-auto'>
             <Button onClick={handleGoHome} variant='primary' className='flex-1'>
-              Bosh sahifaga o‘tish
-            </Button>
-            <Button
-              onClick={handleTakeAnotherTest}
-              variant='secondary'
-              className='flex-1'
-            >
-              Yana bir test topshirish
+              Bosh sahifaga o&apos;tish
             </Button>
           </div>
 
           {/* Contact Info */}
           <div className='mt-8 pt-6 border-t border-gray-200'>
             <p className='text-xs text-gray-500'>
-              Test topshirish bilan bog‘liq savollaringiz bo‘lsa,
-              qo‘llab-quvvatlash xizmatiga murojaat qiling.
+              Test topshirish bilan bog&apos;liq savollaringiz bo&apos;lsa,
+              qo&apos;llab-quvvatlash xizmatiga murojaat qiling.
             </p>
           </div>
         </div>

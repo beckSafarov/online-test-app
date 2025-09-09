@@ -29,7 +29,7 @@ const ViolationWarning: React.FC<ViolationWarningProps> = ({
             <WarningIcon className='w-8 h-8 text-yellow-500' />
           )}
           <h3 className='text-lg font-semibold text-gray-900'>
-            Test xolisligi bo'yicha ogohlantirish
+            Test xolisligi bo&apos;yicha ogohlantirish
           </h3>
         </div>
 
@@ -40,7 +40,7 @@ const ViolationWarning: React.FC<ViolationWarningProps> = ({
 
           {isLastWarning ? (
             <p className='text-red-600 font-medium'>
-              ⚠️ Bu so‘nggi ogohlantirish! Yana bir marta qoidabuzarlik
+              ⚠️ Bu so&apos;nggi ogohlantirish! Yana bir marta qoidabuzarlik
               qilsangiz, test avtomatik yakunlanadi.
             </p>
           ) : violations >= 3 ? (

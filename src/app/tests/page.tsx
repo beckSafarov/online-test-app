@@ -5,31 +5,62 @@ import { useTestStore } from '@/store/testStore'
 import { useEffect } from 'react'
 import { Container, Button, LoadingSpinner } from '@/components'
 import { fetch_test } from '@/utils/api_client'
+import { JSX } from 'react'
 
 const test_rules_test = [
   {
-    strong: '&#34;Ko&#39;chirmachilik qilmang:&#34;',
-    text: ' Ruxsatsiz manbalardan foydalanish yoki boshqalar bilan hamkorlik qilish kabi har qanday aldov taqiqlanadi va darhol diskvalifikatsiya qilinadi.',
+    strong: <>Ko&apos;chirmachilik qilmang:</>,
+    text: (
+      <>
+        Ruxsatsiz manbalardan foydalanish yoki boshqalar bilan hamkorlik qilish
+        kabi har qanday aldov taqiqlanadi va darhol diskvalifikatsiya qilinadi.
+      </>
+    ),
   },
   {
-    strong: 'Tab/Ilova almashtirish mumkin emas:',
-    text: ' Boshqa oynalarga o‘tish, ilovalarni almashtirish yoki test oynasidan chiqish testning avtomatik bekor bo‘lishiga olib keladi.',
+    strong: <>Tab/Ilova almashtirish mumkin emas:</>,
+    text: (
+      <>
+        Boshqa oynalarga o&apos;tish, ilovalarni almashtirish yoki test
+        oynasidan chiqish testning avtomatik bekor bo&apos;lishiga olib keladi.
+      </>
+    ),
   },
   {
-    strong: 'To‘liq ekran rejimi:',
-    text: 'Test to‘liq ekran rejimida topshirilishi kerak. To‘liq ekrandan chiqish testni yakunlashga sabab bo‘ladi.',
+    strong: <>To&apos;liq ekran rejimi:</>,
+    text: (
+      <>
+        Test to&apos;liq ekran rejimida topshirilishi kerak. To&apos;liq
+        ekrandan chiqish testni yakunlashga sabab bo&apos;ladi.
+      </>
+    ),
   },
   {
-    strong: 'Vaqt cheklovi:',
-    text: ' Testni ajratilgan vaqt ichida yakunlang. Vaqt tugaganda test avtomatik topshiriladi.',
+    strong: <>Vaqt cheklovi:</>,
+    text: (
+      <>
+        Testni ajratilgan vaqt ichida yakunlang. Vaqt tugaganda test avtomatik
+        topshiriladi.
+      </>
+    ),
   },
   {
-    strong: 'Bitta urinish.',
-    text: 'Bu testni yakunlash uchun sizda faqat bitta urinish bor. Boshlanganidan so‘ng qayta boshlash mumkin emas.',
+    strong: <>Bitta urinish.</>,
+    text: (
+      <>
+        Bu testni yakunlash uchun sizda faqat bitta urinish bor. Boshlanganidan
+        so&apos;ng qayta boshlash mumkin emas.
+      </>
+    ),
   },
   {
-    strong: 'Texnik talablar.',
-    text: 'Doimiy internetga ega bo‘ling. Test davomida yuzaga kelgan texnik muammolar qayta topshirishga ruxsat bermasligi mumkin.',
+    strong: <>Texnik talablar.</>,
+    text: (
+      <>
+        Doimiy internetga ega bo&apos;ling. Test davomida yuzaga kelgan texnik
+        muammolar qayta topshirishga ruxsat bermasligi mumkin.
+      </>
+    ),
   },
 ]
 
@@ -43,7 +74,7 @@ export default function TestInstructionsPage() {
     // If no test ID or no test data, redirect to home
     if (testId && !currentTest) handleFetchTest()
     if (!testId && !currentTest) {
-      setError('Iltimos, to‘g‘ri test ID raqamini kiriting.')
+      setError('Test ID da xato borga oxshaydi')
       router.push('/')
     }
   }, [testId, currentTest, router, setError])
@@ -56,14 +87,14 @@ export default function TestInstructionsPage() {
         useTestStore.getState().setCurrentTest(res)
       } else {
         setError(
-          'Test topilmadi. Iltimos, bosh sahifadagi to‘g‘ri test ID ni kiriting.'
+          'Test topilmadi. Iltimos, bosh sahifadagi togri test ID ni kiriting.'
         )
         router.push('/')
       }
     } catch (error) {
       console.error('Testni olishda xatolik:', error)
       setError(
-        'Testni olishda xatolik yuz berdi. Keyinroq qayta urinib ko‘ring.'
+        'Testni olishda xatolik yuz berdi. Keyinroq qayta urinib koring.'
       )
       router.push('/')
     } finally {
@@ -96,13 +127,14 @@ export default function TestInstructionsPage() {
         {/* Header Section */}
         <div className='mb-8 sm:mb-12 text-center'>
           <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600 mb-2 sm:mb-4'>
-            Test ko‘rsatmalari
+            Test ko&apos;rsatmalari
           </h1>
           <h2 className='text-lg sm:text-xl lg:text-2xl text-gray-700 mb-2 sm:mb-4'>
             {currentTest.title || 'Dusel Onlayn Test'}
           </h2>
           <p className='text-sm sm:text-base text-gray-600 px-4 sm:px-0'>
-            Davom etishdan oldin quyidagi ko‘rsatmalarni diqqat bilan o‘qing.
+            Davom etishdan oldin quyidagi ko&apos;rsatmalarni diqqat bilan
+            o&apos;qing.
           </p>
         </div>
 
@@ -139,11 +171,14 @@ export default function TestInstructionsPage() {
         {/* Rules Section */}
         <div className='bg-white border border-gray-200 rounded-lg shadow-sm p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8'>
           <h3 className='text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6'>
-            Test qoidalari va yo‘riqnomalar
+            Test qoidalari va yo&apos;riqnomalar
           </h3>
 
           {test_rules_test.map(
-            (rule: { strong: string; text: string }, index: number) => (
+            (
+              rule: { strong: JSX.Element; text: JSX.Element },
+              index: number
+            ) => (
               <div key={index} className='flex items-start'>
                 <div className='flex-shrink-0 mt-1'>
                   <div className='w-2 h-2 bg-red-600 rounded-full'></div>
@@ -190,7 +225,7 @@ export default function TestInstructionsPage() {
         <div className='mt-4 sm:mt-6 text-center'>
           <p className='text-xs sm:text-sm text-gray-500 px-4 sm:px-0'>
             &#34;Davom etish&#34; tugmasini bosish orqali siz barcha test
-            qoidalarini o‘qib chiqqaningiz va ularga rioya qilishga rozilik
+            qoidalarini o&apos;qib chiqqaningiz va ularga rioya qilishga rozilik
             bildirganingizni tasdiqlaysiz.
           </p>
         </div>

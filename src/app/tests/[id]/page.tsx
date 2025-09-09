@@ -1,6 +1,5 @@
 'use client'
-
-import { useTestStore, Question } from '@/store/testStore'
+import { Question, useTestStore } from '@/store/testStore'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import {
@@ -57,7 +56,7 @@ export default function TestPage() {
         setIsFullscreen(true)
       }
     } catch (error) {
-      console.warn('To‘liq ekran so‘rovi bajarilmadi:', error)
+      console.warn('Toliq ekran talabi bajarilmadi:', error)
     }
   }, [])
 
@@ -68,7 +67,7 @@ export default function TestPage() {
         setIsFullscreen(false)
       }
     } catch (error) {
-      console.warn('To‘liq ekrandan chiqish muvaffaqiyatsiz:', error)
+      console.warn('Toliq ekrandan chiqish amalga oshmadi:', error)
     }
   }, [])
 
@@ -131,7 +130,7 @@ export default function TestPage() {
       // Show warning if user manually exited fullscreen
       if (wasFullscreen && !nowFullscreen && currentTest) {
         const shouldReturn = confirm(
-          'Siz to‘liq ekran rejimidan chiqdingiz. Eng yaxshi tajriba uchun to‘liq ekranda qolish tavsiya etiladi. To‘liq ekranga qaytishni xohlaysizmi?'
+          'Siz toliq ekran rejimidan chiqdingiz. Qulayroq foydalanish uchun toliq ekranda qolish tavsiya etiladi. Toliq ekranga qaytishni xohlaysizmi?'
         )
         if (shouldReturn) {
           enterFullscreen()
@@ -175,7 +174,7 @@ export default function TestPage() {
         setTimeout(() => {
           if (!document.fullscreenElement) {
             const shouldReturn = confirm(
-              'Siz Escape tugmasini bosib to‘liq ekran rejimidan chiqdingiz. Eng yaxshi tajriba uchun to‘liq ekranga qaytishni xohlaysizmi?'
+              'Siz Escape tugmasini bosib toliq ekran rejimidan chiqdingiz. Eng yaxshi tajriba uchun toliq ekranga qaytishni xohlaysizmi?'
             )
             if (shouldReturn) {
               enterFullscreen()
@@ -204,7 +203,7 @@ export default function TestPage() {
   useEffect(() => {
     // Validate session ID - redirect if missing
     if (!sessionId) {
-      setError('Noto‘g‘ri sessiya. Iltimos, testni qaytadan boshlang.')
+      setError('Notogri sessiya. Iltimos, testni qaytadan boshlang.')
       router.push('/')
       return
     }
@@ -241,7 +240,7 @@ export default function TestPage() {
     if (!success) {
       console.error(error)
       setError(
-        'Sessiya ma’lumotlarini olishda muammo. Iltimos, qayta urinib ko‘ring'
+        'Sessiya ma’lumotlarini olishda muammo. Iltimos, qayta urinib koring'
       )
       setLoading(false)
       return
@@ -322,13 +321,13 @@ export default function TestPage() {
       ) {
         // This is likely a submission success but API fetch issue after submission
         console.log(
-          'Ehtimol, topshirish muvaffaqiyatli. Natijalarga yo‘naltirilmoqda...'
+          'Ehtimol, topshirish muvaffaqiyatli. Natijalarga yonaltirilmoqda...'
         )
         router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
       } else {
         // For other errors, still redirect but log the issue
         console.error(
-          'Topshirishda xatolik, lekin baribir yo‘naltirilmoqda:',
+          'Topshirishda xatolik, lekin baribir yonaltirilmoqda:',
           errorMessage
         )
         router.push(`/tests/results?testId=${testId}&sessionId=${sessionId}`)
@@ -365,7 +364,7 @@ export default function TestPage() {
   const handleReset = () => {
     if (
       confirm(
-        'Barcha javoblaringizni qayta tiklashni xohlaysizmi? Bu amalni orqaga qaytarib bo‘lmaydi.'
+        'Barcha javoblaringizni qayta tiklashni xohlaysizmi? Bu amalni orqaga qaytarib bolmaydi.'
       )
     ) {
       if (currentTest?.questions) {
@@ -413,16 +412,16 @@ export default function TestPage() {
               Test topilmadi
             </h1>
             <p className='text-gray-600 mb-4'>
-              {error || 'So‘ralgan test topilmadi.'}
+              {error || 'Soralgan test topilmadi.'}
             </p>
             <p className='text-sm text-gray-500 mb-6'>
-              Bosh sahifaga yo‘naltirilmoqda...
+              Bosh sahifaga yo&apos;naltirilmoqda...
             </p>
             <button
               onClick={() => router.push('/')}
               className='px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium'
             >
-              Darhol bosh sahifaga o‘tish
+              Darhol bosh sahifaga o&apos;tish
             </button>
           </div>
         </Container>

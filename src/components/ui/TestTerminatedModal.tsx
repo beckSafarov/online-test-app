@@ -22,7 +22,7 @@ const TestTerminatedModal: React.FC<TestTerminatedModalProps> = ({
 
   const getMessage = () => {
     return reason === 'timeout'
-      ? 'Siz testdan 5 soniyadan ortiq uzoqlashdingiz, bu test halolligi qoidalarini buzadi.'
+      ? 'Siz testdan 5 soniyadan ortiq uzoqlashdingiz, bu test xolisligi qoidalarini buzadi.'
       : 'Siz test oynasidan chiqish orqali ruxsat etilgan qoidabuzarliklar soni (3) dan oshdingiz.'
   }
 
@@ -51,7 +51,8 @@ const TestTerminatedModal: React.FC<TestTerminatedModalProps> = ({
             </div>
 
             <p className='text-sm text-gray-600'>
-              Agar bu xato deb hisoblasangiz, administrator bilan bog‘laning.
+              Agar bu xato deb hisoblasangiz, administrator bilan
+              bog&apos;laning.
             </p>
           </div>
 

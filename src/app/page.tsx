@@ -29,7 +29,7 @@ export default function Home() {
     } catch (error: any) {
       setError(
         error.message ||
-          'Test topilmadi. Iltimos, ID raqamini tekshirib qayta urinib ko‘ring.'
+          'Test topilmadi. Iltimos, ID raqamini tekshirib qayta urinib koring.'
       )
     }
   }

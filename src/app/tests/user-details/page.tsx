@@ -21,7 +21,7 @@ export default function UserDetailsPage() {
   useEffect(() => {
     // If no test ID or no test data, redirect to home
     if (!testId || !currentTest) {
-      setError('Iltimos, bosh sahifadan to‘g‘ri test ID ni kiriting.')
+      setError('Iltimos, bosh sahifadan togri test ID ni kiriting.')
       router.push('/')
     }
   }, [testId, currentTest, router, setError])
@@ -36,7 +36,7 @@ export default function UserDetailsPage() {
     if (!userDetails.phoneNumber.trim()) {
       newErrors.phoneNumber = 'Telefon raqami majburiy'
     } else if (!/^\+?[\d\s\-\(\)]{10,}$/.test(userDetails.phoneNumber.trim())) {
-      newErrors.phoneNumber = 'Iltimos, to‘g‘ri telefon raqamini kiriting'
+      newErrors.phoneNumber = 'Iltimos, togri telefon raqamini kiriting'
     }
 
     setErrors(newErrors)
@@ -49,29 +49,31 @@ export default function UserDetailsPage() {
     setIsSubmitting(true)
 
     try {
-      const formData = new FormData()
-      formData.append('test_id', testId!)
-      formData.append('candidate_name', userDetails.name.trim())
-      formData.append('candidate_phone', userDetails.phoneNumber.trim())
-      formData.append('started_at', new Date().toISOString())
-
       const response = await fetch('/api/test_session', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          testId: testId,
+          userName: userDetails.name,
+          phoneNumber: userDetails.phoneNumber,
+        }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Test sessiyasini yaratib bo‘lmadi')
+        throw new Error(data.error || 'Test sessiyasini boshlashda xatolik')
       }
 
-      // Session created successfully, proceed to test with session ID
-      const sessionId = data.id
-      router.push(`/tests/${testId}?sessionId=${sessionId}`)
+      // On success, navigate to the test with session ID
+      router.push(`/tests/${testId}?sessionId=${data.sessionId}`)
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      setError(error.message || 'Test sessiyasini boshlash muvaffaqiyatsiz')
+      console.error('Test sessiyasini yaratishda xatolik:', error)
+      setError(error.message || 'Test sessiyasini boshlashda xatolik yuz berdi')
     } finally {
       setIsSubmitting(false)
     }
@@ -86,7 +88,7 @@ export default function UserDetailsPage() {
       <div className='min-h-screen bg-white flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Yo‘naltirilmoqda...</p>
+          <p className='text-gray-600'>Yo&apos;naltirilmoqda...</p>
         </div>
       </div>
     )
@@ -98,13 +100,13 @@ export default function UserDetailsPage() {
         {/* Header Section */}
         <div className='mb-8 sm:mb-12 text-center'>
           <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600 mb-2 sm:mb-4'>
-            Foydalanuvchi ma’lumotlari
+            Foydalanuvchi ma&apos;lumotlari
           </h1>
           <h2 className='text-lg sm:text-xl lg:text-2xl text-gray-700 mb-2 sm:mb-4'>
             {currentTest.title || 'Dusel Onlayn Test'}
           </h2>
           <p className='text-sm sm:text-base text-gray-600 px-4 sm:px-0'>
-            Test sessiyasini boshlash uchun ma’lumotlaringizni kiriting.
+            Test sessiyasini boshlash uchun ma&apos;lumotlaringizni kiriting.
           </p>
         </div>
 
@@ -119,13 +121,13 @@ export default function UserDetailsPage() {
           >
             {/* Name Field */}
             <Input
-              label='To‘liq ism-familiya'
+              label="To'liq ism-familiya"
               type='text'
               value={userDetails.name}
               onChange={(e) =>
                 setUserDetails((prev) => ({ ...prev, name: e.target.value }))
               }
-              placeholder='To‘liq ism-familiyangizni kiriting'
+              placeholder="To'liq ism-familiyangizni kiriting"
               disabled={isSubmitting}
               required
               error={errors.name}
@@ -151,8 +153,8 @@ export default function UserDetailsPage() {
             {/* Privacy Notice */}
             <Alert variant='info' title='Maxfiylik haqida bildirishnoma'>
               <p>
-                Ma’lumotlaringiz faqat test sessiyasini kuzatish va tasdiqlash
-                maqsadida ishlatiladi.
+                Ma&apos;lumotlaringiz faqat test sessiyasini kuzatish va
+                tasdiqlash maqsadida ishlatiladi.
               </p>
             </Alert>
           </form>
@@ -185,8 +187,8 @@ export default function UserDetailsPage() {
         {/* Disclaimer */}
         <div className='mt-4 sm:mt-6 text-center'>
           <p className='text-xs sm:text-sm text-gray-500 px-4 sm:px-0'>
-            Test sessiyasini boshlash orqali siz kiritilgan ma’lumotlar
-            to‘g‘riligini tasdiqlaysiz.
+            Test sessiyasini boshlash orqali siz kiritilgan ma&apos;lumotlar
+            to&apos;g&apos;riligini tasdiqlaysiz.
           </p>
         </div>
       </Container>
